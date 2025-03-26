@@ -1,0 +1,17 @@
+GET /auth/callback?state=&session_state=f374dccd-1fb1-4ada-8b6f-ba8ac5e53c96&code=af3582fd-fc43-414d-8d75-c3a00d69eb28.f374dccd-1fb1-4ada-8b6f-ba8ac5e53c96.5d104925-ac66-41e6-8da0-8868c722ed79 HTTP/1.1
+Host: 127.0.0.1:8081
+Cache-Control: max-age=0
+Accept-Language: ru-RU,ru;q=0.9
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Sec-Fetch-Site: cross-site
+Sec-Fetch-Mode: navigate
+Sec-Fetch-User: ?1
+Sec-Fetch-Dest: document
+sec-ch-ua: "Chromium";v="133", "Not(A:Brand";v="99"
+sec-ch-ua-mobile: ?0
+sec-ch-ua-platform: "macOS"
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+

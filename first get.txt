@@ -1,0 +1,10 @@
+GET /realms/master/protocol/openid-connect/auth?client_id=account&response_type=code&redirect_uri=http://127.0.0.1:8081/auth/callback&scope=openid+profile&state= HTTP/1.1
+Host: 172.20.10.9:8090
+Accept-Language: ru-RU,ru;q=0.9
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Referer: http://localhost:8081/
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+
