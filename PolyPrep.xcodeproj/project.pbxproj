@@ -29,9 +29,30 @@
 		81F4816C2D92EF0B0094F556 /* PolyPrepUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PolyPrepUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		811463CB2DB59FDC0093F637 /* Exceptions for "PolyPrep" folder in "PolyPrepTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Views/SplashScreen.swift,
+			);
+			target = 81F481612D92EF0B0094F556 /* PolyPrepTests */;
+		};
+		811463CC2DB59FDC0093F637 /* Exceptions for "PolyPrep" folder in "PolyPrepUITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Views/SplashScreen.swift,
+			);
+			target = 81F4816B2D92EF0B0094F556 /* PolyPrepUITests */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		81F481542D92EF090094F556 /* PolyPrep */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				811463CB2DB59FDC0093F637 /* Exceptions for "PolyPrep" folder in "PolyPrepTests" target */,
+				811463CC2DB59FDC0093F637 /* Exceptions for "PolyPrep" folder in "PolyPrepUITests" target */,
+			);
 			path = PolyPrep;
 			sourceTree = "<group>";
 		};

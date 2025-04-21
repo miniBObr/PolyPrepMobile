@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 
 class AuthService: ObservableObject {
-    @Published var isLoggedIn = false
+    @Published var isLoggedIn = true
     @Published var username: String?
     @Published var error: String?
     @Published var userInfo: UserInfo?
