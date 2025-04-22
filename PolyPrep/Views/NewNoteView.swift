@@ -8,10 +8,17 @@ struct NewNoteView: View {
     @State private var hashtags = ""
     @State private var isPrivate = false
     @State private var isScheduled = false
+    @State private var showAlert = false
+    @State private var alertMessage = ""
     var onNoteCreated: (Note) -> Void
     var currentUsername: String
     
     private let maxLength = 150
+    
+    private var isValidNote: Bool {
+        !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+        !content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
     
     var body: some View {
         NavigationView {
@@ -145,15 +152,21 @@ struct NewNoteView: View {
                             .foregroundColor(.black)
                         
                         Button(action: {
-                            createAndSaveNote()
+                            if isValidNote {
+                                createAndSaveNote()
+                            } else {
+                                alertMessage = "Заполните название и текст заметки"
+                                showAlert = true
+                            }
                         }) {
                             Text("Создать пост")
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
                                 .padding()
-                                .background(Color.black)
+                                .background(isValidNote ? Color.black : Color.gray)
                                 .cornerRadius(8)
                         }
+                        .disabled(!isValidNote)
                     }
                     .padding(.horizontal)
                 }
@@ -172,6 +185,11 @@ struct NewNoteView: View {
                     .foregroundColor(.black)
                 }
             }
+            .alert("Внимание", isPresented: $showAlert) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text(alertMessage)
+            }
         }
     }
     
@@ -187,8 +205,8 @@ struct NewNoteView: View {
         let newNote = Note(
             author: currentUsername,
             date: Date(),
-            title: title,
-            content: content,
+            title: title.trimmingCharacters(in: .whitespacesAndNewlines),
+            content: content.trimmingCharacters(in: .whitespacesAndNewlines),
             hashtags: hashtagsArray,
             likesCount: 0,
             commentsCount: 0
