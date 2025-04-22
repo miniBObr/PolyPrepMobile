@@ -24,6 +24,20 @@ struct NoteCard: View {
         return note.likesCount
     }
     
+    private var commentsCount: Int {
+        if let savedNote = savedNotes.first(where: { $0.id == note.id }) {
+            return savedNote.commentsCount
+        }
+        return note.commentsCount
+    }
+    
+    private var comments: [Comment] {
+        if let savedNote = savedNotes.first(where: { $0.id == note.id }) {
+            return savedNote.comments
+        }
+        return note.comments
+    }
+    
     init(note: Note, savedNotes: Binding<[Note]>, notesManager: NotesManager) {
         self.note = note
         self._savedNotes = savedNotes
@@ -65,6 +79,19 @@ struct NoteCard: View {
             updatedNote.isLiked.toggle()
             updatedNote.likesCount += updatedNote.isLiked ? 1 : -1
             notesManager.updateNoteLikes(noteId: note.id, isLiked: updatedNote.isLiked, likesCount: updatedNote.likesCount)
+        }
+    }
+    
+    private func toggleSaveNote() {
+        if isSaved {
+            savedNotes.removeAll(where: { $0.id == note.id })
+        } else {
+            var updatedNote = note
+            updatedNote.isLiked = isLiked
+            updatedNote.likesCount = likesCount
+            updatedNote.comments = comments
+            updatedNote.commentsCount = commentsCount
+            savedNotes.append(updatedNote)
         }
     }
     
@@ -149,7 +176,7 @@ struct NoteCard: View {
                     HStack(spacing: 4) {
                         Image(systemName: isLiked ? "hand.thumbsup.fill" : "hand.thumbsup")
                             .foregroundColor(isLiked ? .blue : .black)
-                        Text("\(likesCount)")
+                        Text(notesManager.formatCount(likesCount))
                             .foregroundColor(.black)
                     }
                 }
@@ -160,12 +187,12 @@ struct NoteCard: View {
                     HStack(spacing: 4) {
                         Image(systemName: "bubble.left")
                             .foregroundColor(.black)
-                        Text("\(note.commentsCount)")
+                        Text(notesManager.formatCount(commentsCount))
                             .foregroundColor(.black)
                     }
                 }
                 .sheet(isPresented: $showComments) {
-                    CommentsView(note: note)
+                    CommentsView(note: note, notesManager: notesManager, currentUsername: "Макс Пупкин", savedNotes: $savedNotes)
                 }
                 
                 Spacer()
@@ -188,17 +215,6 @@ struct NoteCard: View {
         .padding(.horizontal)
     }
     
-    private func toggleSaveNote() {
-        if isSaved {
-            savedNotes.removeAll(where: { $0.id == note.id })
-        } else {
-            var updatedNote = note
-            updatedNote.isLiked = isLiked
-            updatedNote.likesCount = likesCount
-            savedNotes.append(updatedNote)
-        }
-    }
-    
     private func shareNote() {
         let noteText = "\(note.title)\n\(note.content)"
         let activityVC = UIActivityViewController(activityItems: [noteText], applicationActivities: nil)
@@ -215,15 +231,60 @@ struct CommentsView: View {
     let note: Note
     @Environment(\.dismiss) private var dismiss
     @State private var newComment = ""
+    @ObservedObject var notesManager: NotesManager
+    @State private var currentUsername: String
+    @Binding var savedNotes: [Note]
+    
+    private var currentComments: [Comment] {
+        if let savedNote = savedNotes.first(where: { $0.id == note.id }) {
+            return savedNote.comments
+        }
+        return note.comments
+    }
+    
+    private var currentCommentsCount: Int {
+        if let savedNote = savedNotes.first(where: { $0.id == note.id }) {
+            return savedNote.commentsCount
+        }
+        return note.commentsCount
+    }
+    
+    init(note: Note, notesManager: NotesManager, currentUsername: String, savedNotes: Binding<[Note]>) {
+        self.note = note
+        self.notesManager = notesManager
+        self._currentUsername = State(initialValue: currentUsername)
+        self._savedNotes = savedNotes
+    }
+    
+    private func updateSavedNote(with comment: Comment) {
+        if let index = savedNotes.firstIndex(where: { $0.id == note.id }) {
+            var updatedNote = savedNotes[index]
+            updatedNote.comments.insert(comment, at: 0)
+            updatedNote.commentsCount += 1
+            savedNotes[index] = updatedNote
+        }
+    }
     
     var body: some View {
         NavigationView {
             VStack {
-                ScrollView {
-                    // Здесь будут комментарии
-                    Text("Комментарии пока не реализованы")
-                        .foregroundColor(.gray)
+                if currentComments.isEmpty {
+                    VStack(spacing: 20) {
+                        Spacer()
+                        Text("Прокомментируй первый!")
+                            .font(.headline)
+                            .foregroundColor(.gray)
+                        Spacer()
+                    }
+                } else {
+                    ScrollView {
+                        LazyVStack(spacing: 12) {
+                            ForEach(currentComments) { comment in
+                                CommentView(comment: comment)
+                            }
+                        }
                         .padding()
+                    }
                 }
                 
                 HStack {
@@ -232,8 +293,17 @@ struct CommentsView: View {
                         .padding(.horizontal)
                     
                     Button(action: {
-                        // Добавление комментария
-                        dismiss()
+                        if !newComment.isEmpty {
+                            let comment = Comment(
+                                author: currentUsername,
+                                date: Date(),
+                                text: newComment,
+                                isNew: true
+                            )
+                            notesManager.addComment(to: note.id, comment: comment)
+                            updateSavedNote(with: comment)
+                            newComment = ""
+                        }
                     }) {
                         Text("Отправить")
                             .foregroundColor(.blue)
@@ -242,7 +312,7 @@ struct CommentsView: View {
                 }
                 .padding()
             }
-            .navigationTitle("Комментарии")
+            .navigationTitle("Комментарии (\(notesManager.formatCount(currentCommentsCount)))")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -252,6 +322,29 @@ struct CommentsView: View {
                 }
             }
         }
+    }
+}
+
+struct CommentView: View {
+    let comment: Comment
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text(comment.author)
+                    .font(.headline)
+                Spacer()
+                Text(comment.date, style: .time)
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+            
+            Text(comment.text)
+                .font(.body)
+        }
+        .padding()
+        .background(comment.isNew ? Color.blue.opacity(0.1) : Color.gray.opacity(0.1))
+        .cornerRadius(10)
     }
 }
 

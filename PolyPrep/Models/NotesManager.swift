@@ -9,7 +9,8 @@ class NotesManager: ObservableObject {
             content: "Представляю вам свои гадкие конспекты по вышматы или не вышмату не знаб но не по кмзи точно. Это очень длинный текст, который нужно сократить и показать троеточие в конце. Продолжение текста, которое будет скрыто до нажатия на троеточие.",
             hashtags: ["#матан", "#крипта", "#бип", "#программирование"],
             likesCount: 1,
-            commentsCount: 0
+            commentsCount: 0,
+            comments: []
         ),
         Note(
             author: "Макс Пупкин",
@@ -18,7 +19,11 @@ class NotesManager: ObservableObject {
             content: "Другой интересный конспект по разным предметам",
             hashtags: ["#физика", "#математика", "#информатика"],
             likesCount: 5,
-            commentsCount: 2
+            commentsCount: 2,
+            comments: [
+                Comment(author: "Анна Сидорова", date: Date().addingTimeInterval(-10800), text: "Очень полезно!"),
+                Comment(author: "Сергей Сергеев", date: Date().addingTimeInterval(-14400), text: "Спасибо!")
+            ]
         )
     ]
     
@@ -48,5 +53,22 @@ class NotesManager: ObservableObject {
             notes[index].isLiked = isLiked
             notes[index].likesCount = likesCount
         }
+    }
+    
+    func addComment(to noteId: UUID, comment: Comment) {
+        if let index = notes.firstIndex(where: { $0.id == noteId }) {
+            var updatedNote = notes[index]
+            updatedNote.comments.insert(comment, at: 0)
+            updatedNote.commentsCount += 1
+            notes[index] = updatedNote
+        }
+    }
+    
+    func formatCount(_ count: Int) -> String {
+        if count >= 1000 {
+            let kCount = Double(count) / 1000.0
+            return String(format: "%.1fK", kCount)
+        }
+        return "\(count)"
     }
 } 
