@@ -2,21 +2,70 @@ import SwiftUI
 
 struct NoteCard: View {
     let note: Note
-    @State private var isLiked = false
     @State private var isExpanded = false
-    @State private var likesCount: Int
     @State private var textHeight: CGFloat = 0
+    @State private var hashtagColors: [Color]
     @Binding var savedNotes: [Note]
+    @ObservedObject var notesManager: NotesManager
+    @State private var showComments = false
     
-    init(note: Note, savedNotes: Binding<[Note]>) {
-        self.note = note
-        self._savedNotes = savedNotes
-        self._likesCount = State(initialValue: note.likesCount)
+    // Используем computed property для синхронизации состояния лайка
+    private var isLiked: Bool {
+        if let savedNote = savedNotes.first(where: { $0.id == note.id }) {
+            return savedNote.isLiked
+        }
+        return note.isLiked
     }
     
-    // Используем computed property для синхронизации состояния сохранения
+    private var likesCount: Int {
+        if let savedNote = savedNotes.first(where: { $0.id == note.id }) {
+            return savedNote.likesCount
+        }
+        return note.likesCount
+    }
+    
+    init(note: Note, savedNotes: Binding<[Note]>, notesManager: NotesManager) {
+        self.note = note
+        self._savedNotes = savedNotes
+        self.notesManager = notesManager
+        self._hashtagColors = State(initialValue: Self.generateRandomColors(count: note.hashtags.count))
+    }
+    
+    private static func generateRandomColors(count: Int) -> [Color] {
+        return (0..<count).map { _ in
+            Color(
+                red: Double.random(in: 0...1),
+                green: Double.random(in: 0...1),
+                blue: Double.random(in: 0...1)
+            )
+        }
+    }
+    
+    private func textColor(for backgroundColor: Color) -> Color {
+        let components = backgroundColor.cgColor?.components ?? [0, 0, 0, 1]
+        let brightness = (components[0] * 299 + components[1] * 587 + components[2] * 114) / 1000
+        return brightness > 0.5 ? .black : .white
+    }
+    
     private var isSaved: Bool {
         savedNotes.contains(where: { $0.id == note.id })
+    }
+    
+    private func toggleLike() {
+        if isSaved {
+            if let index = savedNotes.firstIndex(where: { $0.id == note.id }) {
+                var updatedNote = savedNotes[index]
+                updatedNote.isLiked.toggle()
+                updatedNote.likesCount += updatedNote.isLiked ? 1 : -1
+                savedNotes[index] = updatedNote
+                notesManager.updateNoteLikes(noteId: note.id, isLiked: updatedNote.isLiked, likesCount: updatedNote.likesCount)
+            }
+        } else {
+            var updatedNote = note
+            updatedNote.isLiked.toggle()
+            updatedNote.likesCount += updatedNote.isLiked ? 1 : -1
+            notesManager.updateNoteLikes(noteId: note.id, isLiked: updatedNote.isLiked, likesCount: updatedNote.likesCount)
+        }
     }
     
     var body: some View {
@@ -36,12 +85,8 @@ struct NoteCard: View {
                             toggleSaveNote()
                         }
                     }) {
-                        Image(systemName: "bookmark.fill")
-                            .foregroundColor(isSaved ? .yellow : .white)
-                            .overlay(
-                                Image(systemName: "bookmark")
-                                    .foregroundColor(.black)
-                            )
+                        Image(systemName: isSaved ? "bookmark.fill" : "bookmark")
+                            .foregroundColor(isSaved ? .yellow : .black)
                     }
                 }
             }
@@ -78,13 +123,27 @@ struct NoteCard: View {
             }
             .buttonStyle(PlainButtonStyle())
             
+            // Хэштеги
+            if !note.hashtags.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(Array(zip(note.hashtags, hashtagColors)), id: \.0) { hashtag, color in
+                            Text(hashtag)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(color)
+                                .foregroundColor(textColor(for: color))
+                                .cornerRadius(15)
+                        }
+                    }
+                }
+            }
+            
             // Нижняя часть с кнопками
             HStack(spacing: 16) {
-                // Кнопка лайка
                 Button(action: {
                     withAnimation {
-                        isLiked.toggle()
-                        likesCount += isLiked ? 1 : -1
+                        toggleLike()
                     }
                 }) {
                     HStack(spacing: 4) {
@@ -95,9 +154,8 @@ struct NoteCard: View {
                     }
                 }
                 
-                // Кнопка комментариев
                 Button(action: {
-                    // Действие для комментариев
+                    showComments = true
                 }) {
                     HStack(spacing: 4) {
                         Image(systemName: "bubble.left")
@@ -106,10 +164,12 @@ struct NoteCard: View {
                             .foregroundColor(.black)
                     }
                 }
+                .sheet(isPresented: $showComments) {
+                    CommentsView(note: note)
+                }
                 
                 Spacer()
                 
-                // Кнопка шаринга
                 Button(action: {
                     shareNote()
                 }) {
@@ -130,11 +190,12 @@ struct NoteCard: View {
     
     private func toggleSaveNote() {
         if isSaved {
-            // Если заметка уже сохранена, удаляем её из сохраненных
             savedNotes.removeAll(where: { $0.id == note.id })
         } else {
-            // Если заметка не сохранена, добавляем её в сохраненные
-            savedNotes.append(note)
+            var updatedNote = note
+            updatedNote.isLiked = isLiked
+            updatedNote.likesCount = likesCount
+            savedNotes.append(updatedNote)
         }
     }
     
@@ -150,13 +211,62 @@ struct NoteCard: View {
     }
 }
 
+struct CommentsView: View {
+    let note: Note
+    @Environment(\.dismiss) private var dismiss
+    @State private var newComment = ""
+    
+    var body: some View {
+        NavigationView {
+            VStack {
+                ScrollView {
+                    // Здесь будут комментарии
+                    Text("Комментарии пока не реализованы")
+                        .foregroundColor(.gray)
+                        .padding()
+                }
+                
+                HStack {
+                    TextField("Добавить комментарий...", text: $newComment)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .padding(.horizontal)
+                    
+                    Button(action: {
+                        // Добавление комментария
+                        dismiss()
+                    }) {
+                        Text("Отправить")
+                            .foregroundColor(.blue)
+                    }
+                    .disabled(newComment.isEmpty)
+                }
+                .padding()
+            }
+            .navigationTitle("Комментарии")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Закрыть") {
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+}
+
 #Preview {
-    NoteCard(note: Note(
-        author: "Макс Пупкин",
-        date: Date(),
-        title: "Конспекты по кмзи от Пупки Лупкиной",
-        content: "Представляю вам свои гадкие конспекты по вышматы или не вышмату не знаб но не по кмзи точно",
-        likesCount: 1,
-        commentsCount: 0
-    ), savedNotes: .constant([]))
+    NoteCard(
+        note: Note(
+            author: "Макс Пупкин",
+            date: Date(),
+            title: "Конспекты по кмзи от Пупки Лупкиной",
+            content: "Представляю вам свои гадкие конспекты по вышматы или не вышмату не знаб но не по кмзи точно",
+            hashtags: ["#матан", "#крипта", "#бип"],
+            likesCount: 1,
+            commentsCount: 0
+        ),
+        savedNotes: .constant([]),
+        notesManager: NotesManager()
+    )
 } 

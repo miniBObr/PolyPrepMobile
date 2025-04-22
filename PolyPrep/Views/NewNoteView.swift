@@ -176,11 +176,20 @@ struct NewNoteView: View {
     }
     
     private func createAndSaveNote() {
+        let hashtagsArray = hashtags
+            .components(separatedBy: " ")
+            .filter { !$0.isEmpty }
+            .map { word -> String in
+                let trimmedWord = word.trimmingCharacters(in: .whitespaces)
+                return trimmedWord.hasPrefix("#") ? trimmedWord : "#\(trimmedWord)"
+            }
+        
         let newNote = Note(
             author: currentUsername,
             date: Date(),
             title: title,
             content: content,
+            hashtags: hashtagsArray,
             likesCount: 0,
             commentsCount: 0
         )

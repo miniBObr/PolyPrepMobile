@@ -14,6 +14,7 @@ private var allNotes = [
         date: Date(),
         title: "Конспекты по кмзи от Пупки Лупкиной",
         content: "Представляю вам свои гадкие конспекты по вышматы или не вышмату не знаб но не по кмзи точно. Это очень длинный текст, который нужно сократить и показать троеточие в конце. Продолжение текста, которое будет скрыто до нажатия на троеточие.",
+        hashtags: ["#матан", "#крипта", "#бип", "#программирование"],
         likesCount: 1,
         commentsCount: 0
     ),
@@ -22,6 +23,7 @@ private var allNotes = [
         date: Date().addingTimeInterval(-86400),
         title: "Еще один конспект",
         content: "Другой интересный конспект по разным предметам",
+        hashtags: ["#физика", "#математика", "#информатика"],
         likesCount: 5,
         commentsCount: 2
     )
@@ -48,7 +50,7 @@ struct ContentView: View {
                             ScrollView {
                                 LazyVStack(spacing: 16) {
                                     ForEach(notesManager.notes) { note in
-                                        NoteCard(note: note, savedNotes: $savedNotes)
+                                        NoteCard(note: note, savedNotes: $savedNotes, notesManager: notesManager)
                                             .contentShape(Rectangle())
                                     }
                                 }
@@ -118,7 +120,7 @@ struct ContentView: View {
                         ScrollView {
                             LazyVStack(spacing: 16) {
                                 ForEach(savedNotes) { note in
-                                    NoteCard(note: note, savedNotes: $savedNotes)
+                                    NoteCard(note: note, savedNotes: $savedNotes, notesManager: notesManager)
                                         .contentShape(Rectangle())
                                 }
                             }
@@ -215,7 +217,7 @@ struct ProfileView: View {
                                     .padding(.horizontal)
                                 
                                 ForEach(userNotes) { note in
-                                    NoteCard(note: note, savedNotes: .constant([]))
+                                    NoteCard(note: note, savedNotes: .constant([]), notesManager: notesManager)
                                 }
                             }
                             .padding(.top, 32)
