@@ -177,12 +177,15 @@ struct NewNoteView: View {
     
     private func createAndSaveNote() {
         let newNote = Note(
+            id: -1,
             author: currentUsername,
             date: Date(),
             title: title,
             content: content,
             likesCount: 0,
-            commentsCount: 0
+            commentsCount: 0,
+            HashTags: hashtags.components(separatedBy: " "),
+            like_id: -1
         )
         onNoteCreated(newNote)
         dismiss()

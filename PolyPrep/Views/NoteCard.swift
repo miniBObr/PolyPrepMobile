@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct NoteCard: View {
-    let note: Note
+    var note: Note
     @State private var isLiked = false
     @State private var isExpanded = false
     @State private var likesCount: Int
@@ -85,6 +85,14 @@ struct NoteCard: View {
                     withAnimation {
                         isLiked.toggle()
                         likesCount += isLiked ? 1 : -1
+                        if (isLiked)
+                        {
+                            note.SetLike()
+                        }
+                        else
+                        {
+                            note.DelLike()
+                        }
                     }
                 }) {
                     HStack(spacing: 4) {
@@ -152,11 +160,13 @@ struct NoteCard: View {
 
 #Preview {
     NoteCard(note: Note(
+        id: 0,
         author: "Макс Пупкин",
         date: Date(),
         title: "Конспекты по кмзи от Пупки Лупкиной",
         content: "Представляю вам свои гадкие конспекты по вышматы или не вышмату не знаб но не по кмзи точно",
         likesCount: 1,
-        commentsCount: 0
+        commentsCount: 0,
+        like_id: -1
     ), savedNotes: .constant([]))
 } 

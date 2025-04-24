@@ -9,24 +9,24 @@ import SwiftUI
 import AuthenticationServices
 
 // Тестовые данные
-private var allNotes = [
-    Note(
-        author: "Макс Пупкин",
-        date: Date(),
-        title: "Конспекты по кмзи от Пупки Лупкиной",
-        content: "Представляю вам свои гадкие конспекты по вышматы или не вышмату не знаб но не по кмзи точно. Это очень длинный текст, который нужно сократить и показать троеточие в конце. Продолжение текста, которое будет скрыто до нажатия на троеточие.",
-        likesCount: 1,
-        commentsCount: 0
-    ),
-    Note(
-        author: "Макс Пупкин",
-        date: Date().addingTimeInterval(-86400),
-        title: "Еще один конспект",
-        content: "Другой интересный конспект по разным предметам",
-        likesCount: 5,
-        commentsCount: 2
-    )
-]
+//private var allNotes = [
+//    Note(
+//        author: "Макс Пупкин",
+//        date: Date(),
+//        title: "Конспекты по кмзи от Пупки Лупкиной",
+//        content: "11111111Представляю вам свои гадкие конспекты по вышматы или не вышмату не знаб но не по кмзи точно. Это очень длинный текст, который нужно сократить и показать троеточие в конце. Продолжение текста, которое будет скрыто до нажатия на троеточие.",
+//        likesCount: 1,
+//        commentsCount: 0
+//    ),
+//    Note(
+//        author: "Макс Пупкин",
+//        date: Date().addingTimeInterval(-86400),
+//        title: "Еще один конспект",
+//        content: "Другой интересный конспект по разным предметам",
+//        likesCount: 5,
+//        commentsCount: 2
+//    )
+//]
 
 struct ContentView: View {
     @StateObject private var authService = AuthService()
@@ -63,6 +63,9 @@ struct ContentView: View {
                                 // Кнопка поиска
                                 Button(action: {
                                     // Действие для поиска
+                                    Task {
+                                        await notesManager.fetchNotes()
+                                    }
                                 }) {
                                     HStack {
                                         Image(systemName: "magnifyingglass")
@@ -103,6 +106,7 @@ struct ContentView: View {
                 .sheet(isPresented: $showNewNote) {
                     NewNoteView(onNoteCreated: { newNote in
                         notesManager.addNote(newNote)
+                        notesManager.UploadNote(Note: newNote)
                     }, currentUsername: authService.username ?? "Неизвестный пользователь")
                 }
                 .tabItem {
