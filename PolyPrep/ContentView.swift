@@ -34,6 +34,7 @@ struct ContentView: View {
     @State private var savedNotes: [Note] = []
     @State private var selectedTab = 0
     @State private var showNewNote = false
+    @Environment(\.webAuthenticationSession) private var webAuthenticationSession
     
     var body: some View {
         ZStack(alignment: .top) {
@@ -194,15 +195,6 @@ struct ProfileView: View {
                 ScrollView {
                     VStack(spacing: 20) {
                         VStack(spacing: 20) {
-                            Button(action: {
-                                authService.userData(auth: authService)
-                            }) {
-                                Text("Refresh")
-                                    .foregroundColor(.white)
-                                    .frame(width: 200, height: 50)
-                                    .background(Theme.accent)
-                                    .cornerRadius(10)
-                            }
                             Text(authService.username ?? "User")
                                 .font(.title)
                                 .foregroundColor(Theme.header)
@@ -242,7 +234,6 @@ struct ProfileView: View {
             } else {
                 // Экран входа/регистрации
                 VStack(spacing: 20) {
-                    WebAuthenticationSessionExample()
                     NavigationLink(destination: SettingsView()) {
                         Text("Настройки")
                             .foregroundColor(.white)
@@ -252,7 +243,7 @@ struct ProfileView: View {
                     }
                     .buttonStyle(ScaleButtonStyle())
                     Button(action: {
-//                        authService.register()
+                        authService.register()
 //                        showSafari = true
                     }) {
                         Text("Регистрация")
@@ -270,10 +261,10 @@ struct ProfileView: View {
 //                    }
                     
                     Button(action: {
-//                        authService.login()
-//                        showSafari = true
-                        self.startingWebAuthenticationSession = true
-                    }) {
+                        Task {
+                            await authService.CheckAuth(with: webAuthenticationSession)
+                        }
+                        }) {
                         Text("Вход")
                             .foregroundColor(.white)
                             .frame(width: 200, height: 50)
@@ -281,9 +272,9 @@ struct ProfileView: View {
                             .cornerRadius(10)
                     }
                     .buttonStyle(ScaleButtonStyle())
-                    .sheet(isPresented: $showSafari) {
-                        SafariView(url: URL(string: "http://90.156.170.153:8091/realms/master/protocol/openid-connect/auth?client_id=polyclient&response_type=code&scope=openid%20profile&redirect_uri=http://90.156.170.153:3001/user")!)
-                    }
+//                    .sheet(isPresented: $showSafari) {
+//                        SafariView(url: URL(string: "http://90.156.170.153:8091/realms/master/protocol/openid-connect/auth?client_id=polyclient&response_type=code&scope=openid%20profile&redirect_uri=http://90.156.170.153:3001/user")!)
+//                    }
                 }
             }
         }

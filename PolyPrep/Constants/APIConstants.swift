@@ -7,10 +7,10 @@ enum APIConstants {
     enum AuthEndpoints {
         static let login = "/auth/login"
         static let register = "/auth/register"
-        static let userInfo = "/auth/user-info"
-        static let check = "/auth/check"
+        static let userInfo = "/user"
+        static let check = "/auth/mobile/check"
         static let logout = "/auth/logout"
-        static let callback = "auth/callback"
-        static let refresh = "auth/refresh"
+        static let callback = "/auth/mobile/callback"
+        static let refresh = "/auth/refresh"
     }
 } 
