@@ -9,6 +9,8 @@ struct NoteCard: View {
     @Binding var savedNotes: [Note]
     @ObservedObject var notesManager: NotesManager
     @State private var showComments = false
+    @State private var showDeleteAlert = false
+    var currentUsername: String
     
     // Используем computed property для синхронизации состояния лайка
     private var isLiked: Bool {
@@ -39,10 +41,11 @@ struct NoteCard: View {
         return note.comments
     }
     
-    init(note: Note, savedNotes: Binding<[Note]>, notesManager: NotesManager) {
+    init(note: Note, savedNotes: Binding<[Note]>, notesManager: NotesManager, currentUsername: String) {
         self.note = note
         self._savedNotes = savedNotes
         self.notesManager = notesManager
+        self.currentUsername = currentUsername
         self._hashtagColors = State(initialValue: Self.generateRandomColors(count: note.hashtags.count))
     }
     
@@ -105,16 +108,41 @@ struct NoteCard: View {
                     .foregroundColor(.black)
                 Spacer()
                 VStack(alignment: .trailing, spacing: 4) {
-                    Text(note.date, style: .date)
-                        .font(.subheadline)
-                        .foregroundColor(.black)
-                    Button(action: {
-                        withAnimation {
-                            toggleSaveNote()
+                    HStack(spacing: 4) {
+                        if note.isScheduled {
+                            Image(systemName: "clock.fill")
+                                .foregroundColor(.black)
+                            Text("Time")
+                                .font(.caption)
+                                .foregroundColor(.black)
+                        } else if note.isPrivate {
+                            Image(systemName: "lock.fill")
+                                .foregroundColor(.black)
+                            Text("Private")
+                                .font(.caption)
+                                .foregroundColor(.black)
                         }
-                    }) {
-                        Image(systemName: isSaved ? "bookmark.fill" : "bookmark")
-                            .foregroundColor(isSaved ? .yellow : .black)
+                        Text(note.date, style: .date)
+                            .font(.subheadline)
+                            .foregroundColor(.black)
+                    }
+                    HStack(spacing: 8) {
+                        if note.author == currentUsername {
+                            Button(action: {
+                                showDeleteAlert = true
+                            }) {
+                                Image(systemName: "trash")
+                                    .foregroundColor(.red)
+                            }
+                        }
+                        Button(action: {
+                            withAnimation {
+                                toggleSaveNote()
+                            }
+                        }) {
+                            Image(systemName: isSaved ? "bookmark.fill" : "bookmark")
+                                .foregroundColor(isSaved ? .yellow : .black)
+                        }
                     }
                 }
             }
@@ -186,31 +214,33 @@ struct NoteCard: View {
             
             // Нижняя часть с кнопками
             HStack(spacing: 16) {
-                Button(action: {
-                    withAnimation {
-                        toggleLike()
+                if !note.isPrivate {
+                    Button(action: {
+                        withAnimation {
+                            toggleLike()
+                        }
+                    }) {
+                        HStack(spacing: 4) {
+                            Image(systemName: isLiked ? "hand.thumbsup.fill" : "hand.thumbsup")
+                                .foregroundColor(isLiked ? .blue : .black)
+                            Text(notesManager.formatCount(likesCount))
+                                .foregroundColor(.black)
+                        }
                     }
-                }) {
-                    HStack(spacing: 4) {
-                        Image(systemName: isLiked ? "hand.thumbsup.fill" : "hand.thumbsup")
-                            .foregroundColor(isLiked ? .blue : .black)
-                        Text(notesManager.formatCount(likesCount))
-                            .foregroundColor(.black)
+                    
+                    Button(action: {
+                        showComments = true
+                    }) {
+                        HStack(spacing: 4) {
+                            Image(systemName: "bubble.left")
+                                .foregroundColor(.black)
+                            Text(notesManager.formatCount(commentsCount))
+                                .foregroundColor(.black)
+                        }
                     }
-                }
-                
-                Button(action: {
-                    showComments = true
-                }) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "bubble.left")
-                            .foregroundColor(.black)
-                        Text(notesManager.formatCount(commentsCount))
-                            .foregroundColor(.black)
+                    .sheet(isPresented: $showComments) {
+                        CommentsView(note: note, notesManager: notesManager, currentUsername: "Макс Пупкин", savedNotes: $savedNotes)
                     }
-                }
-                .sheet(isPresented: $showComments) {
-                    CommentsView(note: note, notesManager: notesManager, currentUsername: "Макс Пупкин", savedNotes: $savedNotes)
                 }
                 
                 Spacer()
@@ -228,9 +258,20 @@ struct NoteCard: View {
         .clipShape(RoundedRectangle(cornerRadius: 8))
         .overlay(
             RoundedRectangle(cornerRadius: 8)
-                .stroke(Color.black, lineWidth: 1)
+                .stroke(note.isPrivate ? Color.black : Color.gray, lineWidth: note.isPrivate ? 2 : 1)
         )
         .padding(.horizontal)
+        .alert("Удалить заметку?", isPresented: $showDeleteAlert) {
+            Button("Отмена", role: .cancel) { }
+            Button("Удалить", role: .destructive) {
+                notesManager.deleteNote(noteId: note.id)
+                if isSaved {
+                    savedNotes.removeAll { $0.id == note.id }
+                }
+            }
+        } message: {
+            Text("Это действие нельзя отменить")
+        }
     }
     
     private func shareNote() {
@@ -491,6 +532,7 @@ struct AudioPlayerView: View {
             commentsCount: 0
         ),
         savedNotes: .constant([]),
-        notesManager: NotesManager()
+        notesManager: NotesManager(),
+        currentUsername: "Макс Пупкин"
     )
-} 
+}

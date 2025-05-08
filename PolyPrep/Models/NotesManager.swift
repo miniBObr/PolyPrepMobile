@@ -27,7 +27,48 @@ class NotesManager: ObservableObject {
         )
     ]
     
+    private var timer: Timer?
+    
+    init() {
+        startScheduledNotesTimer()
+    }
+    
+    deinit {
+        timer?.invalidate()
+    }
+    
+    private func startScheduledNotesTimer() {
+        // Проверяем отложенные заметки каждую минуту
+        timer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
+            self?.checkScheduledNotes()
+        }
+    }
+    
+    private func checkScheduledNotes() {
+        let now = Date()
+        var updatedNotes = notes
+        
+        for (index, note) in notes.enumerated() {
+            if note.isScheduled,
+               let scheduledDate = note.scheduledDate,
+               scheduledDate <= now {
+                var updatedNote = note
+                updatedNote.isScheduled = false
+                updatedNote.isPrivate = false
+                updatedNote.scheduledDate = nil
+                updatedNotes[index] = updatedNote
+            }
+        }
+        
+        if updatedNotes != notes {
+            DispatchQueue.main.async { [weak self] in
+                self?.notes = updatedNotes
+            }
+        }
+    }
+    
     func addNote(_ note: Note) {
+        // Все заметки добавляются в начало списка
         notes.insert(note, at: 0)
     }
     
@@ -71,4 +112,16 @@ class NotesManager: ObservableObject {
         }
         return "\(count)"
     }
-} 
+    
+    func deleteNote(noteId: UUID) {
+        notes.removeAll { $0.id == noteId }
+    }
+    
+    func getScheduledNotes(username: String) -> [Note] {
+        notes.filter { $0.author == username && $0.isScheduled }
+    }
+    
+    func getActiveNotes(username: String) -> [Note] {
+        notes.filter { $0.author == username && !$0.isScheduled }
+    }
+}

@@ -10,6 +10,7 @@ struct NewNoteView: View {
     @State private var hashtags = ""
     @State private var isPrivate = false
     @State private var isScheduled = false
+    @State private var scheduledDate = Date().addingTimeInterval(3600) // По умолчанию через час
     @State private var showAlert = false
     @State private var alertMessage = ""
     @State private var showImagePicker = false
@@ -155,11 +156,27 @@ struct NewNoteView: View {
                         }
                         
                         Toggle(isOn: $isScheduled) {
-                            Text("Отложенная отправка")
+                            Text("Отложенная публикация")
                                 .foregroundColor(.black)
+                        }
+                        
+                        if isScheduled {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Дата и время публикации")
+                                    .font(.subheadline)
+                                    .foregroundColor(.black)
+                                
+                                DatePicker("", selection: $scheduledDate, in: Date()...)
+                                    .datePickerStyle(.compact)
+                                    .labelsHidden()
+                                    .padding(.vertical, 8)
+                            }
+                            .padding(.leading)
+                            .transition(.opacity)
                         }
                     }
                     .padding(.horizontal)
+                    .animation(.easeInOut, value: isScheduled)
                     
                     // Последний шаг
                     VStack(alignment: .leading, spacing: 8) {
@@ -245,6 +262,9 @@ struct NewNoteView: View {
             hashtags: hashtagsArray,
             likesCount: 0,
             commentsCount: 0,
+            isPrivate: isPrivate || isScheduled, // Отложенные заметки всегда приватные
+            isScheduled: isScheduled,
+            scheduledDate: isScheduled ? scheduledDate : nil,
             attachments: attachments
         )
         onNoteCreated(newNote)
@@ -346,5 +366,5 @@ struct DocumentPicker: UIViewControllerRepresentable {
             }
         }
     }
-} 
+}
  

@@ -131,4 +131,4 @@ class AuthService: ObservableObject {
             UIApplication.shared.open(url)
         }
     }
-} 
+}

@@ -1,18 +1,16 @@
 import Foundation
 
-struct Attachment: Identifiable, Codable {
-    let id: UUID
+struct Attachment: Identifiable, Equatable {
+    let id = UUID()
     let fileName: String
     let fileType: String
     let fileData: Data
-    let createdAt: Date
     
-    init(id: UUID = UUID(), fileName: String, fileType: String, fileData: Data) {
-        self.id = id
-        self.fileName = fileName
-        self.fileType = fileType
-        self.fileData = fileData
-        self.createdAt = Date()
+    static func == (lhs: Attachment, rhs: Attachment) -> Bool {
+        lhs.id == rhs.id &&
+        lhs.fileName == rhs.fileName &&
+        lhs.fileType == rhs.fileType &&
+        lhs.fileData == rhs.fileData
     }
 }
 
@@ -21,4 +19,4 @@ enum AttachmentType: String, Codable {
     case audio
     case document
     case other
-} 
+}

@@ -8,4 +8,4 @@ enum APIConstants {
         static let register = "/auth/register"
         static let userInfo = "/auth/user-info"
     }
-} 
+}

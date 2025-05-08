@@ -50,7 +50,7 @@ struct ContentView: View {
                             ScrollView {
                                 LazyVStack(spacing: 16) {
                                     ForEach(notesManager.notes) { note in
-                                        NoteCard(note: note, savedNotes: $savedNotes, notesManager: notesManager)
+                                        NoteCard(note: note, savedNotes: $savedNotes, notesManager: notesManager, currentUsername: authService.username ?? "Неизвестный пользователь")
                                             .contentShape(Rectangle())
                                     }
                                 }
@@ -120,7 +120,7 @@ struct ContentView: View {
                         ScrollView {
                             LazyVStack(spacing: 16) {
                                 ForEach(savedNotes) { note in
-                                    NoteCard(note: note, savedNotes: $savedNotes, notesManager: notesManager)
+                                    NoteCard(note: note, savedNotes: $savedNotes, notesManager: notesManager, currentUsername: authService.username ?? "Неизвестный пользователь")
                                         .contentShape(Rectangle())
                                 }
                             }
@@ -208,7 +208,7 @@ struct ProfileView: View {
                         }
                         .padding(.top, 60)
                         
-                        // Заметки пользователя
+                        // Все заметки пользователя
                         if !userNotes.isEmpty {
                             VStack(alignment: .leading, spacing: 16) {
                                 Text("Мои заметки")
@@ -217,13 +217,12 @@ struct ProfileView: View {
                                     .padding(.horizontal)
                                 
                                 ForEach(userNotes) { note in
-                                    NoteCard(note: note, savedNotes: .constant([]), notesManager: notesManager)
+                                    NoteCard(note: note, savedNotes: .constant(userNotes), notesManager: notesManager, currentUsername: authService.username ?? "Неизвестный пользователь")
                                 }
                             }
                             .padding(.top, 32)
                         }
-        }
-        .padding()
+                    }
                 }
             } else {
                 // Экран входа/регистрации
