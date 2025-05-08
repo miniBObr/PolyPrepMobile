@@ -1,15 +1,19 @@
 import SwiftUI
+import PhotosUI
+import UniformTypeIdentifiers
 
 struct NewNoteView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var title = ""
     @State private var content = ""
-    @State private var attachments: [String] = []
+    @State private var attachments: [Attachment] = []
     @State private var hashtags = ""
     @State private var isPrivate = false
     @State private var isScheduled = false
     @State private var showAlert = false
     @State private var alertMessage = ""
+    @State private var showImagePicker = false
+    @State private var showDocumentPicker = false
     var onNoteCreated: (Note) -> Void
     var currentUsername: String
     
@@ -22,36 +26,29 @@ struct NewNoteView: View {
     
     var body: some View {
         NavigationView {
-            ScrollView(showsIndicators: true) {
+            ScrollView {
                 VStack(spacing: 16) {
                     // Заголовок
                     VStack(alignment: .leading) {
                         Text("Заголовок")
                             .font(.headline)
                             .foregroundColor(.black)
-                        TextField("Конспекты по математике", text: $title)
-                            .onChange(of: title) { newValue in
-                                if newValue.count > maxLength {
-                                    title = String(newValue.prefix(maxLength))
-                                }
-                            }
+                        TextField("Введите заголовок", text: $title)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .foregroundColor(.black)
                     }
                     .padding(.horizontal)
                     
-                    Text("\(title.count) / \(maxLength)")
-                        .foregroundColor(title.count == maxLength ? .red : .gray)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                        .padding(.horizontal)
-                    
-                    // Текст
+                    // Текст заметки
                     VStack(alignment: .leading) {
-                        Text("Текст")
+                        Text("Текст заметки")
                             .font(.headline)
                             .foregroundColor(.black)
                         TextEditor(text: $content)
-                            .frame(minHeight: 200)
+                            .frame(minHeight: 100)
+                            .padding(4)
+                            .background(Color.white)
+                            .cornerRadius(8)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
                                     .stroke(Color.gray, lineWidth: 1)
@@ -66,13 +63,15 @@ struct NewNoteView: View {
                             .font(.headline)
                             .foregroundColor(.black)
                         
-                        ForEach(attachments, id: \.self) { attachment in
+                        ForEach(attachments) { attachment in
                             HStack {
-                                Text(attachment)
+                                Image(systemName: attachmentIcon(for: attachment.fileType))
+                                    .foregroundColor(.black)
+                                Text(attachment.fileName)
                                     .foregroundColor(.black)
                                 Spacer()
                                 Button(action: {
-                                    if let index = attachments.firstIndex(of: attachment) {
+                                    if let index = attachments.firstIndex(where: { $0.id == attachment.id }) {
                                         attachments.remove(at: index)
                                     }
                                 }) {
@@ -89,19 +88,36 @@ struct NewNoteView: View {
                             )
                         }
                         
-                        Button(action: {
-                            // Добавить вложение
-                        }) {
-                            Text("+ Добавить вложение")
-                                .foregroundColor(.black)
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.white)
-                                .cornerRadius(8)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .stroke(Color.gray, lineWidth: 1)
-                                )
+                        HStack {
+                            Button(action: {
+                                showImagePicker = true
+                            }) {
+                                Label("Фото", systemImage: "photo")
+                                    .foregroundColor(.black)
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color.white)
+                                    .cornerRadius(8)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(Color.gray, lineWidth: 1)
+                                    )
+                            }
+                            
+                            Button(action: {
+                                showDocumentPicker = true
+                            }) {
+                                Label("Файл", systemImage: "doc")
+                                    .foregroundColor(.black)
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color.white)
+                                    .cornerRadius(8)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(Color.gray, lineWidth: 1)
+                                    )
+                            }
                         }
                     }
                     .padding(.horizontal)
@@ -190,6 +206,25 @@ struct NewNoteView: View {
             } message: {
                 Text(alertMessage)
             }
+            .sheet(isPresented: $showImagePicker) {
+                ImagePicker(attachments: $attachments)
+            }
+            .sheet(isPresented: $showDocumentPicker) {
+                DocumentPicker(attachments: $attachments)
+            }
+        }
+    }
+    
+    private func attachmentIcon(for fileType: String) -> String {
+        switch fileType.lowercased() {
+        case "image/jpeg", "image/png", "image/gif":
+            return "photo"
+        case "audio/mpeg", "audio/wav":
+            return "music.note"
+        case "application/pdf":
+            return "doc.text"
+        default:
+            return "doc"
         }
     }
     
@@ -209,9 +244,107 @@ struct NewNoteView: View {
             content: content.trimmingCharacters(in: .whitespacesAndNewlines),
             hashtags: hashtagsArray,
             likesCount: 0,
-            commentsCount: 0
+            commentsCount: 0,
+            attachments: attachments
         )
         onNoteCreated(newNote)
         dismiss()
     }
+}
+
+struct ImagePicker: UIViewControllerRepresentable {
+    @Binding var attachments: [Attachment]
+    @Environment(\.dismiss) private var dismiss
+    
+    func makeUIViewController(context: Context) -> PHPickerViewController {
+        var config = PHPickerConfiguration()
+        config.filter = .images
+        config.selectionLimit = 0
+        let picker = PHPickerViewController(configuration: config)
+        picker.delegate = context.coordinator
+        return picker
+    }
+    
+    func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    class Coordinator: NSObject, PHPickerViewControllerDelegate {
+        let parent: ImagePicker
+        
+        init(_ parent: ImagePicker) {
+            self.parent = parent
+        }
+        
+        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+            parent.dismiss()
+            
+            for result in results {
+                if result.itemProvider.canLoadObject(ofClass: UIImage.self) {
+                    result.itemProvider.loadObject(ofClass: UIImage.self) { [weak self] object, error in
+                        if let image = object as? UIImage,
+                           let imageData = image.jpegData(compressionQuality: 0.8) {
+                            let attachment = Attachment(
+                                fileName: "image_\(Date().timeIntervalSince1970).jpg",
+                                fileType: "image/jpeg",
+                                fileData: imageData
+                            )
+                            DispatchQueue.main.async {
+                                self?.parent.attachments.append(attachment)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+struct DocumentPicker: UIViewControllerRepresentable {
+    @Binding var attachments: [Attachment]
+    @Environment(\.dismiss) private var dismiss
+    
+    func makeUIViewController(context: Context) -> UIDocumentPickerViewController {
+        let picker = UIDocumentPickerViewController(forOpeningContentTypes: [.pdf, .audio, .image])
+        picker.delegate = context.coordinator
+        picker.allowsMultipleSelection = true
+        return picker
+    }
+    
+    func updateUIViewController(_ uiViewController: UIDocumentPickerViewController, context: Context) {}
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    class Coordinator: NSObject, UIDocumentPickerDelegate {
+        let parent: DocumentPicker
+        
+        init(_ parent: DocumentPicker) {
+            self.parent = parent
+        }
+        
+        func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+            parent.dismiss()
+            
+            for url in urls {
+                do {
+                    let data = try Data(contentsOf: url)
+                    let attachment = Attachment(
+                        fileName: url.lastPathComponent,
+                        fileType: url.pathExtension,
+                        fileData: data
+                    )
+                    DispatchQueue.main.async {
+                        self.parent.attachments.append(attachment)
+                    }
+                } catch {
+                    print("Error loading file: \(error)")
+                }
+            }
+        }
+    }
 } 
+ 

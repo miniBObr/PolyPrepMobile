@@ -1,4 +1,5 @@
 import SwiftUI
+import AVFoundation
 
 struct NoteCard: View {
     let note: Note
@@ -129,13 +130,13 @@ struct NoteCard: View {
             
             // Контент
             Button(action: {
-                if textHeight > 60 {
+                if textHeight > 60 || note.attachments.count > 2 {
                     withAnimation {
                         isExpanded.toggle()
                     }
                 }
             }) {
-                Text(note.content + (textHeight > 60 && !isExpanded ? "..." : ""))
+                Text(note.content + ((textHeight > 60 || note.attachments.count > 2) && !isExpanded ? "..." : ""))
                     .font(.body)
                     .foregroundColor(.black)
                     .lineLimit(isExpanded ? nil : 3)
@@ -149,6 +150,23 @@ struct NoteCard: View {
                     )
             }
             .buttonStyle(PlainButtonStyle())
+            
+            // Вложения
+            if !note.attachments.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Вложения")
+                        .font(.headline)
+                        .foregroundColor(.black)
+                    
+                    ForEach(Array(note.attachments.enumerated()), id: \.element.id) { index, attachment in
+                        if isExpanded || index < 2 {
+                            AttachmentView(attachment: attachment)
+                                .opacity(isExpanded ? 1 : (index == 1 && note.attachments.count > 2 ? 0.5 : 1))
+                        }
+                    }
+                }
+                .padding(.top, 8)
+            }
             
             // Хэштеги
             if !note.hashtags.isEmpty {
@@ -345,6 +363,119 @@ struct CommentView: View {
         .padding()
         .background(comment.isNew ? Color.blue.opacity(0.1) : Color.gray.opacity(0.1))
         .cornerRadius(10)
+    }
+}
+
+struct AttachmentView: View {
+    let attachment: Attachment
+    @State private var showPreview = false
+    
+    var body: some View {
+        Button(action: {
+            showPreview = true
+        }) {
+            HStack {
+                Image(systemName: attachmentIcon(for: attachment.fileType))
+                    .foregroundColor(.black)
+                Text(attachment.fileName)
+                    .foregroundColor(.black)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .foregroundColor(.gray)
+            }
+            .padding(8)
+            .background(Color.white)
+            .cornerRadius(8)
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color.gray, lineWidth: 1)
+            )
+        }
+        .sheet(isPresented: $showPreview) {
+            AttachmentPreviewView(attachment: attachment)
+        }
+    }
+    
+    private func attachmentIcon(for fileType: String) -> String {
+        switch fileType.lowercased() {
+        case "image/jpeg", "image/png", "image/gif":
+            return "photo"
+        case "audio/mpeg", "audio/wav":
+            return "music.note"
+        case "application/pdf":
+            return "doc.text"
+        default:
+            return "doc"
+        }
+    }
+}
+
+struct AttachmentPreviewView: View {
+    let attachment: Attachment
+    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        NavigationView {
+            Group {
+                if attachment.fileType.lowercased().contains("image") {
+                    if let image = UIImage(data: attachment.fileData) {
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFit()
+                    }
+                } else if attachment.fileType.lowercased().contains("audio") {
+                    AudioPlayerView(data: attachment.fileData)
+                } else {
+                    Text("Предпросмотр недоступен")
+                        .foregroundColor(.gray)
+                }
+            }
+            .navigationTitle(attachment.fileName)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Закрыть") {
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+}
+
+struct AudioPlayerView: View {
+    let data: Data
+    @State private var isPlaying = false
+    @State private var audioPlayer: AVAudioPlayer?
+    
+    var body: some View {
+        VStack {
+            Button(action: {
+                if isPlaying {
+                    audioPlayer?.pause()
+                } else {
+                    if audioPlayer == nil {
+                        do {
+                            audioPlayer = try AVAudioPlayer(data: data)
+                            audioPlayer?.prepareToPlay()
+                        } catch {
+                            print("Error creating audio player: \(error)")
+                        }
+                    }
+                    audioPlayer?.play()
+                }
+                isPlaying.toggle()
+            }) {
+                Image(systemName: isPlaying ? "pause.circle.fill" : "play.circle.fill")
+                    .resizable()
+                    .frame(width: 64, height: 64)
+                    .foregroundColor(.black)
+            }
+        }
+        .onDisappear {
+            audioPlayer?.stop()
+            audioPlayer = nil
+        }
     }
 }
 

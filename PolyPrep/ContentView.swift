@@ -222,8 +222,8 @@ struct ProfileView: View {
                             }
                             .padding(.top, 32)
                         }
-                    }
-                    .padding()
+        }
+        .padding()
                 }
             } else {
                 // Экран входа/регистрации

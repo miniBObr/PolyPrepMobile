@@ -20,4 +20,5 @@ struct Note: Identifiable {
     var isLiked: Bool = false
     var isSaved: Bool = false
     var comments: [Comment] = []
+    var attachments: [Attachment] = []
 } 
