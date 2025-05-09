@@ -19,11 +19,4 @@ struct Attachment: Identifiable, Equatable, Codable {
         lhs.fileType == rhs.fileType &&
         lhs.fileData == rhs.fileData
     }
-}
-
-enum AttachmentType: String, Codable {
-    case image
-    case audio
-    case document
-    case other
-}
+} 

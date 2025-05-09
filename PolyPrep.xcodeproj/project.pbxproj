@@ -6,7 +6,32 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		8194E53D2DCE186400B976DF /* PolyPrep_ Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 8194E51A2DCE186200B976DF /* PolyPrep_ Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
+		8194E52A2DCE186400B976DF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 81F4814A2D92EF090094F556 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8194E5192DCE186200B976DF;
+			remoteInfo = "PolyPrep_ Watch App";
+		};
+		8194E5342DCE186400B976DF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 81F4814A2D92EF090094F556 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8194E5192DCE186200B976DF;
+			remoteInfo = "PolyPrep_ Watch App";
+		};
+		8194E53B2DCE186400B976DF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 81F4814A2D92EF090094F556 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8194E5192DCE186200B976DF;
+			remoteInfo = "PolyPrep_ Watch App";
+		};
 		81F481632D92EF0B0094F556 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 81F4814A2D92EF090094F556 /* Project object */;
@@ -23,7 +48,24 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		8194E5412DCE186400B976DF /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				8194E53D2DCE186400B976DF /* PolyPrep_ Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		8194E51A2DCE186200B976DF /* PolyPrep_ Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "PolyPrep_ Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8194E5292DCE186400B976DF /* PolyPrep_ Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "PolyPrep_ Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8194E5332DCE186400B976DF /* PolyPrep_ Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "PolyPrep_ Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81F481522D92EF090094F556 /* PolyPrep.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PolyPrep.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		81F481622D92EF0B0094F556 /* PolyPrepTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PolyPrepTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		81F4816C2D92EF0B0094F556 /* PolyPrepUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PolyPrepUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -44,14 +86,37 @@
 			);
 			target = 81F4816B2D92EF0B0094F556 /* PolyPrepUITests */;
 		};
+		8194E5602DCE343F00B976DF /* Exceptions for "PolyPrep" folder in "PolyPrep_ Watch App" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Models/SharedNotesManager.swift,
+			);
+			target = 8194E5192DCE186200B976DF /* PolyPrep_ Watch App */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		8194E51B2DCE186200B976DF /* PolyPrep_ Watch App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "PolyPrep_ Watch App";
+			sourceTree = "<group>";
+		};
+		8194E52C2DCE186400B976DF /* PolyPrep_ Watch AppTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "PolyPrep_ Watch AppTests";
+			sourceTree = "<group>";
+		};
+		8194E5362DCE186400B976DF /* PolyPrep_ Watch AppUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "PolyPrep_ Watch AppUITests";
+			sourceTree = "<group>";
+		};
 		81F481542D92EF090094F556 /* PolyPrep */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				811463CB2DB59FDC0093F637 /* Exceptions for "PolyPrep" folder in "PolyPrepTests" target */,
 				811463CC2DB59FDC0093F637 /* Exceptions for "PolyPrep" folder in "PolyPrepUITests" target */,
+				8194E5602DCE343F00B976DF /* Exceptions for "PolyPrep" folder in "PolyPrep_ Watch App" target */,
 			);
 			path = PolyPrep;
 			sourceTree = "<group>";
@@ -69,6 +134,27 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		8194E5172DCE186200B976DF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8194E5262DCE186400B976DF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8194E5302DCE186400B976DF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		81F4814F2D92EF090094F556 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -99,6 +185,9 @@
 				81F481542D92EF090094F556 /* PolyPrep */,
 				81F481652D92EF0B0094F556 /* PolyPrepTests */,
 				81F4816F2D92EF0B0094F556 /* PolyPrepUITests */,
+				8194E51B2DCE186200B976DF /* PolyPrep_ Watch App */,
+				8194E52C2DCE186400B976DF /* PolyPrep_ Watch AppTests */,
+				8194E5362DCE186400B976DF /* PolyPrep_ Watch AppUITests */,
 				81F481532D92EF090094F556 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -109,6 +198,9 @@
 				81F481522D92EF090094F556 /* PolyPrep.app */,
 				81F481622D92EF0B0094F556 /* PolyPrepTests.xctest */,
 				81F4816C2D92EF0B0094F556 /* PolyPrepUITests.xctest */,
+				8194E51A2DCE186200B976DF /* PolyPrep_ Watch App.app */,
+				8194E5292DCE186400B976DF /* PolyPrep_ Watch AppTests.xctest */,
+				8194E5332DCE186400B976DF /* PolyPrep_ Watch AppUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -116,6 +208,74 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		8194E5192DCE186200B976DF /* PolyPrep_ Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8194E53E2DCE186400B976DF /* Build configuration list for PBXNativeTarget "PolyPrep_ Watch App" */;
+			buildPhases = (
+				8194E5162DCE186200B976DF /* Sources */,
+				8194E5172DCE186200B976DF /* Frameworks */,
+				8194E5182DCE186200B976DF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				8194E51B2DCE186200B976DF /* PolyPrep_ Watch App */,
+			);
+			name = "PolyPrep_ Watch App";
+			packageProductDependencies = (
+			);
+			productName = "PolyPrep_ Watch App";
+			productReference = 8194E51A2DCE186200B976DF /* PolyPrep_ Watch App.app */;
+			productType = "com.apple.product-type.application";
+		};
+		8194E5282DCE186400B976DF /* PolyPrep_ Watch AppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8194E5422DCE186400B976DF /* Build configuration list for PBXNativeTarget "PolyPrep_ Watch AppTests" */;
+			buildPhases = (
+				8194E5252DCE186400B976DF /* Sources */,
+				8194E5262DCE186400B976DF /* Frameworks */,
+				8194E5272DCE186400B976DF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8194E52B2DCE186400B976DF /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				8194E52C2DCE186400B976DF /* PolyPrep_ Watch AppTests */,
+			);
+			name = "PolyPrep_ Watch AppTests";
+			packageProductDependencies = (
+			);
+			productName = "PolyPrep_ Watch AppTests";
+			productReference = 8194E5292DCE186400B976DF /* PolyPrep_ Watch AppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		8194E5322DCE186400B976DF /* PolyPrep_ Watch AppUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8194E5452DCE186400B976DF /* Build configuration list for PBXNativeTarget "PolyPrep_ Watch AppUITests" */;
+			buildPhases = (
+				8194E52F2DCE186400B976DF /* Sources */,
+				8194E5302DCE186400B976DF /* Frameworks */,
+				8194E5312DCE186400B976DF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8194E5352DCE186400B976DF /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				8194E5362DCE186400B976DF /* PolyPrep_ Watch AppUITests */,
+			);
+			name = "PolyPrep_ Watch AppUITests";
+			packageProductDependencies = (
+			);
+			productName = "PolyPrep_ Watch AppUITests";
+			productReference = 8194E5332DCE186400B976DF /* PolyPrep_ Watch AppUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		81F481512D92EF090094F556 /* PolyPrep */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 81F481762D92EF0B0094F556 /* Build configuration list for PBXNativeTarget "PolyPrep" */;
@@ -123,10 +283,12 @@
 				81F4814E2D92EF090094F556 /* Sources */,
 				81F4814F2D92EF090094F556 /* Frameworks */,
 				81F481502D92EF090094F556 /* Resources */,
+				8194E5412DCE186400B976DF /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				8194E53C2DCE186400B976DF /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				81F481542D92EF090094F556 /* PolyPrep */,
@@ -194,6 +356,17 @@
 				LastSwiftUpdateCheck = 1620;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
+					8194E5192DCE186200B976DF = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					8194E5282DCE186400B976DF = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 8194E5192DCE186200B976DF;
+					};
+					8194E5322DCE186400B976DF = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 8194E5192DCE186200B976DF;
+					};
 					81F481512D92EF090094F556 = {
 						CreatedOnToolsVersion = 16.2;
 					};
@@ -224,11 +397,35 @@
 				81F481512D92EF090094F556 /* PolyPrep */,
 				81F481612D92EF0B0094F556 /* PolyPrepTests */,
 				81F4816B2D92EF0B0094F556 /* PolyPrepUITests */,
+				8194E5192DCE186200B976DF /* PolyPrep_ Watch App */,
+				8194E5282DCE186400B976DF /* PolyPrep_ Watch AppTests */,
+				8194E5322DCE186400B976DF /* PolyPrep_ Watch AppUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		8194E5182DCE186200B976DF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8194E5272DCE186400B976DF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8194E5312DCE186400B976DF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		81F481502D92EF090094F556 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -253,6 +450,27 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		8194E5162DCE186200B976DF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8194E5252DCE186400B976DF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8194E52F2DCE186400B976DF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		81F4814E2D92EF090094F556 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -277,6 +495,21 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		8194E52B2DCE186400B976DF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8194E5192DCE186200B976DF /* PolyPrep_ Watch App */;
+			targetProxy = 8194E52A2DCE186400B976DF /* PBXContainerItemProxy */;
+		};
+		8194E5352DCE186400B976DF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8194E5192DCE186200B976DF /* PolyPrep_ Watch App */;
+			targetProxy = 8194E5342DCE186400B976DF /* PBXContainerItemProxy */;
+		};
+		8194E53C2DCE186400B976DF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8194E5192DCE186200B976DF /* PolyPrep_ Watch App */;
+			targetProxy = 8194E53B2DCE186400B976DF /* PBXContainerItemProxy */;
+		};
 		81F481642D92EF0B0094F556 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 81F481512D92EF090094F556 /* PolyPrep */;
@@ -290,6 +523,146 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		8194E53F2DCE186400B976DF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "PolyPrep_ Watch App/PolyPrep_ Watch App.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"PolyPrep_ Watch App/Preview Content\"";
+				DEVELOPMENT_TEAM = JK8G5DLHK4;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = PolyPrep_;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.PolyPrep;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.PolyPrep.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Debug;
+		};
+		8194E5402DCE186400B976DF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "PolyPrep_ Watch App/PolyPrep_ Watch App.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"PolyPrep_ Watch App/Preview Content\"";
+				DEVELOPMENT_TEAM = JK8G5DLHK4;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = PolyPrep_;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.PolyPrep;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.PolyPrep.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Release;
+		};
+		8194E5432DCE186400B976DF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = JK8G5DLHK4;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.PolyPrep--Watch-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PolyPrep_ Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/PolyPrep_ Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Debug;
+		};
+		8194E5442DCE186400B976DF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = JK8G5DLHK4;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.PolyPrep--Watch-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PolyPrep_ Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/PolyPrep_ Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Release;
+		};
+		8194E5462DCE186400B976DF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = JK8G5DLHK4;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.PolyPrep--Watch-AppUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = "PolyPrep_ Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Debug;
+		};
+		8194E5472DCE186400B976DF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = JK8G5DLHK4;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.PolyPrep--Watch-AppUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = "PolyPrep_ Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Release;
+		};
 		81F481742D92EF0B0094F556 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -414,6 +787,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = PolyPrep/PolyPrep.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"PolyPrep/Preview Content\"";
@@ -443,6 +817,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = PolyPrep/PolyPrep.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"PolyPrep/Preview Content\"";
@@ -542,6 +917,33 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		8194E53E2DCE186400B976DF /* Build configuration list for PBXNativeTarget "PolyPrep_ Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8194E53F2DCE186400B976DF /* Debug */,
+				8194E5402DCE186400B976DF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8194E5422DCE186400B976DF /* Build configuration list for PBXNativeTarget "PolyPrep_ Watch AppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8194E5432DCE186400B976DF /* Debug */,
+				8194E5442DCE186400B976DF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8194E5452DCE186400B976DF /* Build configuration list for PBXNativeTarget "PolyPrep_ Watch AppUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8194E5462DCE186400B976DF /* Debug */,
+				8194E5472DCE186400B976DF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		81F4814D2D92EF090094F556 /* Build configuration list for PBXProject "PolyPrep" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

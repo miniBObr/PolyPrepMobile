@@ -31,7 +31,7 @@ private var allNotes = [
 
 struct ContentView: View {
     @StateObject private var authService = AuthService()
-    @StateObject private var notesManager = NotesManager()
+    @StateObject private var notesManager = SharedNotesManager.shared
     @State private var savedNotes: [Note] = []
     @State private var selectedTab = 0
     @State private var showNewNote = false
@@ -174,12 +174,12 @@ struct ContentView: View {
 
 struct ProfileView: View {
     @ObservedObject var authService: AuthService
-    @ObservedObject var notesManager: NotesManager
+    @ObservedObject var notesManager: SharedNotesManager
     @StateObject private var userProfile: UserProfile
     @State private var showImagePicker = false
     @State private var showAvatarMenu = false
     
-    init(authService: AuthService, notesManager: NotesManager) {
+    init(authService: AuthService, notesManager: SharedNotesManager) {
         self.authService = authService
         self.notesManager = notesManager
         self._userProfile = StateObject(wrappedValue: UserProfile(username: authService.username ?? ""))

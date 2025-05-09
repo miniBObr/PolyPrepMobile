@@ -3,53 +3,29 @@ import AVFoundation
 
 struct NoteCard: View {
     let note: Note
-    @State private var isExpanded = false
-    @State private var textHeight: CGFloat = 0
-    @State private var hashtagColors: [Color]
     @Binding var savedNotes: [Note]
-    @ObservedObject var notesManager: NotesManager
-    @State private var showComments = false
+    @ObservedObject var notesManager: SharedNotesManager
+    let currentUsername: String
+    
+    @State private var isExpanded = false
+    @State private var isLiked = false
+    @State private var isSaved = false
     @State private var showDeleteAlert = false
-    var currentUsername: String
+    @State private var showComments = false
+    @State private var textHeight: CGFloat = 0
+    @State private var hashtagColors: [Color] = []
     
-    // Используем computed property для синхронизации состояния лайка
-    private var isLiked: Bool {
-        if let savedNote = savedNotes.first(where: { $0.id == note.id }) {
-            return savedNote.isLiked
-        }
-        return note.isLiked
-    }
-    
-    private var likesCount: Int {
-        if let savedNote = savedNotes.first(where: { $0.id == note.id }) {
-            return savedNote.likesCount
-        }
-        return note.likesCount
-    }
-    
-    private var commentsCount: Int {
-        if let savedNote = savedNotes.first(where: { $0.id == note.id }) {
-            return savedNote.commentsCount
-        }
-        return note.commentsCount
-    }
-    
-    private var comments: [Comment] {
-        if let savedNote = savedNotes.first(where: { $0.id == note.id }) {
-            return savedNote.comments
-        }
-        return note.comments
-    }
-    
-    init(note: Note, savedNotes: Binding<[Note]>, notesManager: NotesManager, currentUsername: String) {
+    init(note: Note, savedNotes: Binding<[Note]>, notesManager: SharedNotesManager, currentUsername: String) {
         self.note = note
         self._savedNotes = savedNotes
         self.notesManager = notesManager
         self.currentUsername = currentUsername
-        self._hashtagColors = State(initialValue: Self.generateRandomColors(count: note.hashtags.count))
+        _isLiked = State(initialValue: note.isLiked)
+        _isSaved = State(initialValue: savedNotes.wrappedValue.contains { $0.id == note.id })
+        _hashtagColors = State(initialValue: generateRandomColors(count: note.hashtags.count))
     }
     
-    private static func generateRandomColors(count: Int) -> [Color] {
+    private func generateRandomColors(count: Int) -> [Color] {
         return (0..<count).map { _ in
             Color(
                 red: Double.random(in: 0...1),
@@ -65,193 +41,92 @@ struct NoteCard: View {
         return brightness > 0.5 ? .black : .white
     }
     
-    private var isSaved: Bool {
-        savedNotes.contains(where: { $0.id == note.id })
-    }
-    
     private func toggleLike() {
-        if isSaved {
-            if let index = savedNotes.firstIndex(where: { $0.id == note.id }) {
-                var updatedNote = savedNotes[index]
-                updatedNote.isLiked.toggle()
-                updatedNote.likesCount += updatedNote.isLiked ? 1 : -1
-                savedNotes[index] = updatedNote
-                notesManager.updateNoteLikes(noteId: note.id, isLiked: updatedNote.isLiked, likesCount: updatedNote.likesCount)
-            }
-        } else {
-            var updatedNote = note
-            updatedNote.isLiked.toggle()
-            updatedNote.likesCount += updatedNote.isLiked ? 1 : -1
-            notesManager.updateNoteLikes(noteId: note.id, isLiked: updatedNote.isLiked, likesCount: updatedNote.likesCount)
-        }
+        isLiked.toggle()
+        notesManager.updateNoteLikes(noteId: note.id, isLiked: isLiked, likesCount: note.likesCount + (isLiked ? 1 : -1))
     }
     
     private func toggleSaveNote() {
+        isSaved.toggle()
         if isSaved {
-            savedNotes.removeAll(where: { $0.id == note.id })
+            savedNotes.append(note)
         } else {
-            var updatedNote = note
-            updatedNote.isLiked = isLiked
-            updatedNote.likesCount = likesCount
-            updatedNote.comments = comments
-            updatedNote.commentsCount = commentsCount
-            savedNotes.append(updatedNote)
+            savedNotes.removeAll { $0.id == note.id }
         }
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            // Заголовок, дата и кнопка сохранения
+        VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text(note.title)
                     .font(.headline)
                     .foregroundColor(.black)
+                
                 Spacer()
-                VStack(alignment: .trailing, spacing: 4) {
-                    HStack(spacing: 4) {
-                        if note.isScheduled {
-                            Image(systemName: "clock.fill")
-                                .foregroundColor(.black)
-                            Text("Time")
-                                .font(.caption)
-                                .foregroundColor(.black)
-                        } else if note.isPrivate {
-                            Image(systemName: "lock.fill")
-                                .foregroundColor(.black)
-                            Text("Private")
-                                .font(.caption)
-                                .foregroundColor(.black)
-                        }
-                        Text(note.date, style: .date)
-                            .font(.subheadline)
-                            .foregroundColor(.black)
-                    }
-                    HStack(spacing: 8) {
-                        if note.author == currentUsername {
-                            Button(action: {
-                                showDeleteAlert = true
-                            }) {
-                                Image(systemName: "trash")
-                                    .foregroundColor(.red)
-                            }
-                        }
+                
+                HStack(spacing: 8) {
+                    if note.author == currentUsername {
                         Button(action: {
-                            withAnimation {
-                                toggleSaveNote()
-                            }
+                            showDeleteAlert = true
                         }) {
-                            Image(systemName: isSaved ? "bookmark.fill" : "bookmark")
-                                .foregroundColor(isSaved ? .yellow : .black)
+                            Image(systemName: "trash")
+                                .foregroundColor(.red)
                         }
                     }
-                }
-            }
-            
-            // Автор
-            HStack {
-                Image(systemName: "person.circle.fill")
-                    .foregroundColor(.black)
-                Text(note.author)
-                    .font(.subheadline)
-                    .foregroundColor(.black)
-            }
-            
-            // Контент
-            Button(action: {
-                if textHeight > 60 || note.attachments.count > 2 {
-                    withAnimation {
-                        isExpanded.toggle()
-                    }
-                }
-            }) {
-                Text(note.content + ((textHeight > 60 || note.attachments.count > 2) && !isExpanded ? "..." : ""))
-                    .font(.body)
-                    .foregroundColor(.black)
-                    .lineLimit(isExpanded ? nil : 3)
-                    .multilineTextAlignment(.leading)
-                    .background(
-                        GeometryReader { geometry in
-                            Color.clear.onAppear {
-                                textHeight = geometry.size.height
-                            }
-                        }
-                    )
-            }
-            .buttonStyle(PlainButtonStyle())
-            
-            // Вложения
-            if !note.attachments.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Вложения")
-                        .font(.headline)
-                        .foregroundColor(.black)
-                    
-                    ForEach(Array(note.attachments.enumerated()), id: \.element.id) { index, attachment in
-                        if isExpanded || index < 2 {
-                            AttachmentView(attachment: attachment)
-                                .opacity(isExpanded ? 1 : (index == 1 && note.attachments.count > 2 ? 0.5 : 1))
-                        }
-                    }
-                }
-                .padding(.top, 8)
-            }
-            
-            // Хэштеги
-            if !note.hashtags.isEmpty {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(Array(zip(note.hashtags, hashtagColors)), id: \.0) { hashtag, color in
-                            Text(hashtag)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(color)
-                                .foregroundColor(textColor(for: color))
-                                .cornerRadius(15)
-                        }
-                    }
-                }
-            }
-            
-            // Нижняя часть с кнопками
-            HStack(spacing: 16) {
-                if !note.isPrivate {
                     Button(action: {
                         withAnimation {
-                            toggleLike()
+                            toggleSaveNote()
                         }
                     }) {
-                        HStack(spacing: 4) {
-                            Image(systemName: isLiked ? "hand.thumbsup.fill" : "hand.thumbsup")
-                                .foregroundColor(isLiked ? .blue : .black)
-                            Text(notesManager.formatCount(likesCount))
-                                .foregroundColor(.black)
-                        }
+                        Image(systemName: isSaved ? "bookmark.fill" : "bookmark")
+                            .foregroundColor(isSaved ? .yellow : .black)
                     }
-                    
-                    Button(action: {
-                        showComments = true
-                    }) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "bubble.left")
-                                .foregroundColor(.black)
-                            Text(notesManager.formatCount(commentsCount))
-                                .foregroundColor(.black)
-                        }
-                    }
-                    .sheet(isPresented: $showComments) {
-                        CommentsView(note: note, notesManager: notesManager, currentUsername: "Макс Пупкин", savedNotes: $savedNotes)
-                    }
-                }
-                
-                Spacer()
-                
-                Button(action: {
-                    shareNote()
-                }) {
-                    Image(systemName: "square.and.arrow.up")
-                        .foregroundColor(.black)
                 }
             }
+            
+            AuthorView(author: note.author)
+            
+            NoteContentView(
+                content: note.content,
+                textHeight: $textHeight,
+                isExpanded: isExpanded,
+                onTap: {
+                    if textHeight > 60 || note.attachments.count > 2 {
+                        withAnimation {
+                            isExpanded.toggle()
+                        }
+                    }
+                }
+            )
+            
+            AttachmentsView(
+                attachments: note.attachments,
+                isExpanded: isExpanded
+            )
+            
+            HashtagsView(
+                hashtags: note.hashtags,
+                hashtagColors: hashtagColors,
+                textColor: textColor
+            )
+            
+            ActionsView(
+                note: note,
+                isPrivate: note.isPrivate,
+                isLiked: isLiked,
+                likesCount: note.likesCount,
+                commentsCount: note.commentsCount,
+                notesManager: notesManager,
+                currentUsername: currentUsername,
+                savedNotes: $savedNotes,
+                onLike: {
+                    withAnimation {
+                        toggleLike()
+                    }
+                },
+                onShare: shareNote,
+                showComments: $showComments
+            )
         }
         .padding()
         .background(Color.white)
@@ -264,7 +139,7 @@ struct NoteCard: View {
         .alert("Удалить заметку?", isPresented: $showDeleteAlert) {
             Button("Отмена", role: .cancel) { }
             Button("Удалить", role: .destructive) {
-                notesManager.deleteNote(noteId: note.id)
+                notesManager.deleteNote(note)
                 if isSaved {
                     savedNotes.removeAll { $0.id == note.id }
                 }
@@ -286,11 +161,144 @@ struct NoteCard: View {
     }
 }
 
+private struct AuthorView: View {
+    let author: String
+    
+    var body: some View {
+        HStack {
+            Image(systemName: "person.circle.fill")
+                .foregroundColor(.black)
+            Text(author)
+                .font(.subheadline)
+                .foregroundColor(.black)
+        }
+    }
+}
+
+private struct NoteContentView: View {
+    let content: String
+    @Binding var textHeight: CGFloat
+    let isExpanded: Bool
+    let onTap: () -> Void
+    
+    var body: some View {
+        Button(action: onTap) {
+            Text(content + ((textHeight > 60) && !isExpanded ? "..." : ""))
+                .font(.body)
+                .foregroundColor(.black)
+                .lineLimit(isExpanded ? nil : 3)
+                .multilineTextAlignment(.leading)
+                .background(
+                    GeometryReader { geometry in
+                        Color.clear.onAppear {
+                            textHeight = geometry.size.height
+                        }
+                    }
+                )
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+}
+
+private struct AttachmentsView: View {
+    let attachments: [Attachment]
+    let isExpanded: Bool
+    
+    var body: some View {
+        if !attachments.isEmpty {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Вложения")
+                    .font(.headline)
+                    .foregroundColor(.black)
+                
+                ForEach(Array(attachments.enumerated()), id: \.element.id) { index, attachment in
+                    if isExpanded || index < 2 {
+                        AttachmentView(attachment: attachment)
+                            .opacity(isExpanded ? 1 : (index == 1 && attachments.count > 2 ? 0.5 : 1))
+                    }
+                }
+            }
+            .padding(.top, 8)
+        }
+    }
+}
+
+private struct HashtagsView: View {
+    let hashtags: [String]
+    let hashtagColors: [Color]
+    let textColor: (Color) -> Color
+    
+    var body: some View {
+        if !hashtags.isEmpty {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(Array(zip(hashtags, hashtagColors)), id: \.0) { hashtag, color in
+                        Text(hashtag)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(color)
+                            .foregroundColor(textColor(color))
+                            .cornerRadius(15)
+                    }
+                }
+            }
+        }
+    }
+}
+
+private struct ActionsView: View {
+    let note: Note
+    let isPrivate: Bool
+    let isLiked: Bool
+    let likesCount: Int
+    let commentsCount: Int
+    let notesManager: SharedNotesManager
+    let currentUsername: String
+    let savedNotes: Binding<[Note]>
+    let onLike: () -> Void
+    let onShare: () -> Void
+    @Binding var showComments: Bool
+    
+    var body: some View {
+        HStack(spacing: 16) {
+            if !isPrivate {
+                Button(action: onLike) {
+                    HStack(spacing: 4) {
+                        Image(systemName: isLiked ? "hand.thumbsup.fill" : "hand.thumbsup")
+                            .foregroundColor(isLiked ? .blue : .black)
+                        Text(notesManager.formatCount(likesCount))
+                            .foregroundColor(.black)
+                    }
+                }
+                
+                Button(action: { showComments = true }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "bubble.left")
+                            .foregroundColor(.black)
+                        Text(notesManager.formatCount(commentsCount))
+                            .foregroundColor(.black)
+                    }
+                }
+                .sheet(isPresented: $showComments) {
+                    CommentsView(note: note, notesManager: notesManager, currentUsername: currentUsername, savedNotes: savedNotes)
+                }
+            }
+            
+            Spacer()
+            
+            Button(action: onShare) {
+                Image(systemName: "square.and.arrow.up")
+                    .foregroundColor(.black)
+            }
+        }
+    }
+}
+
 struct CommentsView: View {
     let note: Note
     @Environment(\.dismiss) private var dismiss
     @State private var newComment = ""
-    @ObservedObject var notesManager: NotesManager
+    @ObservedObject var notesManager: SharedNotesManager
     @State private var currentUsername: String
     @Binding var savedNotes: [Note]
     
@@ -308,7 +316,7 @@ struct CommentsView: View {
         return note.commentsCount
     }
     
-    init(note: Note, notesManager: NotesManager, currentUsername: String, savedNotes: Binding<[Note]>) {
+    init(note: Note, notesManager: SharedNotesManager, currentUsername: String, savedNotes: Binding<[Note]>) {
         self.note = note
         self.notesManager = notesManager
         self._currentUsername = State(initialValue: currentUsername)
@@ -356,8 +364,7 @@ struct CommentsView: View {
                             let comment = Comment(
                                 author: currentUsername,
                                 date: Date(),
-                                text: newComment,
-                                isNew: true
+                                text: newComment
                             )
                             notesManager.addComment(to: note.id, comment: comment)
                             updateSavedNote(with: comment)
@@ -391,19 +398,21 @@ struct CommentView: View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
                 Text(comment.author)
-                    .font(.headline)
-                Spacer()
-                Text(comment.date, style: .time)
                     .font(.caption)
+                    .foregroundColor(.blue)
+                
+                Spacer()
+                
+                Text(comment.date, style: .date)
+                    .font(.caption2)
                     .foregroundColor(.gray)
             }
             
             Text(comment.text)
                 .font(.body)
+                .foregroundColor(.black)
         }
-        .padding()
-        .background(comment.isNew ? Color.blue.opacity(0.1) : Color.gray.opacity(0.1))
-        .cornerRadius(10)
+        .padding(.vertical, 4)
     }
 }
 
@@ -532,7 +541,8 @@ struct AudioPlayerView: View {
             commentsCount: 0
         ),
         savedNotes: .constant([]),
-        notesManager: NotesManager(),
+        notesManager: SharedNotesManager.shared,
         currentUsername: "Макс Пупкин"
     )
 }
+ 

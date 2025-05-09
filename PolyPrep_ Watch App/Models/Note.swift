@@ -48,4 +48,4 @@ struct Note: Identifiable, Equatable, Codable {
         self.attachments = attachments
         self.comments = comments
     }
-}
+} 
