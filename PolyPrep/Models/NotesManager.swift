@@ -113,14 +113,14 @@ class NotesManager: ObservableObject {
                         for post in posts {
                             addNote(
                                 Note(
-                                    id: post["id"] as! Int,
-                                    author: try await getUsername(id: post["author_id"] as! String),
+//                                    id: post["id"] as! Int,
+                                    author: await getUsername(id: post["author_id"] as! String),
                                     date: Date(timeIntervalSince1970: post["updated_at"] as! TimeInterval),
                                     title: post["title"] as! String, content: post["text"] as! String,
-                                    likesCount: try await getLikesCount(id: post["id"] as! Int),
-                                    commentsCount: 0,
-                                    HashTags: post["hashtages"] as! [String],
-                                    like_id: -1
+                                    hashtags: post["hashtages"] as! [String],
+                                    likesCount: 0,
+                                    commentsCount: await getLikesCount(id: post["id"] as! Int)
+//                                    like_id: -1
                                 )
                             )
                             }
@@ -223,7 +223,7 @@ class NotesManager: ObservableObject {
                 "title": Note.title,
                 "text": Note.content,
                 "public": true,
-                "hashtages": Note.HashTags,
+                "hashtages": Note.hashtags,
                 "scheduled_at": NSNull() // эквивалент null в JSON
             ]
         
