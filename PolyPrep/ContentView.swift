@@ -9,6 +9,7 @@ import SwiftUI
 import AuthenticationServices
 
 // Тестовые данные
+
 //private var allNotes = [
 //    Note(
 //        author: "Макс Пупкин",
@@ -28,9 +29,10 @@ import AuthenticationServices
 //    )
 //]
 
+
 struct ContentView: View {
     @StateObject private var authService = AuthService()
-    @StateObject private var notesManager = NotesManager()
+    @StateObject private var notesManager = SharedNotesManager.shared
     @State private var savedNotes: [Note] = []
     @State private var selectedTab = 0
     @State private var showNewNote = false
@@ -50,7 +52,7 @@ struct ContentView: View {
                             ScrollView {
                                 LazyVStack(spacing: 16) {
                                     ForEach(notesManager.notes) { note in
-                                        NoteCard(note: note, savedNotes: $savedNotes)
+                                        NoteCard(note: note, savedNotes: $savedNotes, notesManager: notesManager, currentUsername: authService.username ?? "Неизвестный пользователь")
                                             .contentShape(Rectangle())
                                     }
                                 }
@@ -124,7 +126,7 @@ struct ContentView: View {
                         ScrollView {
                             LazyVStack(spacing: 16) {
                                 ForEach(savedNotes) { note in
-                                    NoteCard(note: note, savedNotes: $savedNotes)
+                                    NoteCard(note: note, savedNotes: $savedNotes, notesManager: notesManager, currentUsername: authService.username ?? "Неизвестный пользователь")
                                         .contentShape(Rectangle())
                                 }
                             }
@@ -178,10 +180,22 @@ struct ContentView: View {
 
 struct ProfileView: View {
     @ObservedObject var authService: AuthService
-    @ObservedObject var notesManager: NotesManager
+
     @State private var showSafari = false
     @State private var startingWebAuthenticationSession = false
     @Environment(\.webAuthenticationSession) private var webAuthenticationSession
+
+    @ObservedObject var notesManager: SharedNotesManager
+    @StateObject private var userProfile: UserProfile
+    @State private var showImagePicker = false
+    @State private var showAvatarMenu = false
+    
+    init(authService: AuthService, notesManager: SharedNotesManager) {
+        self.authService = authService
+        self.notesManager = notesManager
+        self._userProfile = StateObject(wrappedValue: UserProfile(username: authService.username ?? ""))
+    }
+
     
     var userNotes: [Note] {
         notesManager.getUserNotes(username: authService.username ?? "")
@@ -195,6 +209,48 @@ struct ProfileView: View {
                 ScrollView {
                     VStack(spacing: 20) {
                         VStack(spacing: 20) {
+                            // Аватарка
+                            ZStack {
+                                if let avatarData = userProfile.avatarImage,
+                                   let uiImage = UIImage(data: avatarData) {
+                                    Image(uiImage: uiImage)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 120, height: 120)
+                                        .clipShape(Circle())
+                                        .overlay(Circle().stroke(Color.white, lineWidth: 2))
+                                } else {
+                                    Image(systemName: "person.circle.fill")
+                                        .resizable()
+                                        .frame(width: 120, height: 120)
+                                        .foregroundColor(.gray)
+                                }
+                                
+                                // Кнопка изменения аватарки
+                                Button(action: {
+                                    showAvatarMenu = true
+                                }) {
+                                    Image(systemName: "pencil.circle.fill")
+                                        .resizable()
+                                        .frame(width: 30, height: 30)
+                                        .foregroundColor(.black)
+                                        .background(Color.white)
+                                        .clipShape(Circle())
+                                }
+                                .offset(x: 40, y: 40)
+                                .confirmationDialog("Изменить аватар", isPresented: $showAvatarMenu) {
+                                    Button("Выбрать фото") {
+                                        showImagePicker = true
+                                    }
+                                    if userProfile.avatarImage != nil {
+                                        Button("Удалить фото", role: .destructive) {
+                                            userProfile.deleteAvatar()
+                                        }
+                                    }
+                                    Button("Отмена", role: .cancel) { }
+                                }
+                            }
+                            
                             Text(authService.username ?? "User")
                                 .font(.title)
                                 .foregroundColor(Theme.header)
@@ -214,7 +270,7 @@ struct ProfileView: View {
                         }
                         .padding(.top, 60)
                         
-                        // Заметки пользователя
+                        // Все заметки пользователя
                         if !userNotes.isEmpty {
                             VStack(alignment: .leading, spacing: 16) {
                                 Text("Мои заметки")
@@ -223,13 +279,12 @@ struct ProfileView: View {
                                     .padding(.horizontal)
                                 
                                 ForEach(userNotes) { note in
-                                    NoteCard(note: note, savedNotes: .constant([]))
+                                    NoteCard(note: note, savedNotes: .constant(userNotes), notesManager: notesManager, currentUsername: authService.username ?? "Неизвестный пользователь")
                                 }
                             }
                             .padding(.top, 32)
                         }
                     }
-                    .padding()
                 }
             } else {
                 // Экран входа/регистрации
@@ -275,6 +330,13 @@ struct ProfileView: View {
 //                    .sheet(isPresented: $showSafari) {
 //                        SafariView(url: URL(string: "http://90.156.170.153:8091/realms/master/protocol/openid-connect/auth?client_id=polyclient&response_type=code&scope=openid%20profile&redirect_uri=http://90.156.170.153:3001/user")!)
 //                    }
+                }
+            }
+        }
+        .sheet(isPresented: $showImagePicker) {
+            ImagePicker(attachments: .constant([])) { imageData in
+                if let data = imageData {
+                    userProfile.saveAvatar(data)
                 }
             }
         }

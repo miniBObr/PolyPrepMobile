@@ -19,4 +19,6 @@ struct UserInfo: Codable {
 struct AuthError: Codable {
     let error: String
     let message: String
-} 
+
+}
+
