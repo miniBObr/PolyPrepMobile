@@ -6,28 +6,29 @@
 //
 
 import SwiftUI
+import AuthenticationServices
 
 // Тестовые данные
-private var allNotes = [
-    Note(
-        author: "Макс Пупкин",
-        date: Date(),
-        title: "Конспекты по кмзи от Пупки Лупкиной",
-        content: "Представляю вам свои гадкие конспекты по вышматы или не вышмату не знаб но не по кмзи точно. Это очень длинный текст, который нужно сократить и показать троеточие в конце. Продолжение текста, которое будет скрыто до нажатия на троеточие.",
-        hashtags: ["#матан", "#крипта", "#бип", "#программирование"],
-        likesCount: 1,
-        commentsCount: 0
-    ),
-    Note(
-        author: "Макс Пупкин",
-        date: Date().addingTimeInterval(-86400),
-        title: "Еще один конспект",
-        content: "Другой интересный конспект по разным предметам",
-        hashtags: ["#физика", "#математика", "#информатика"],
-        likesCount: 5,
-        commentsCount: 2
-    )
-]
+
+//private var allNotes = [
+//    Note(
+//        author: "Макс Пупкин",
+//        date: Date(),
+//        title: "Конспекты по кмзи от Пупки Лупкиной",
+//        content: "11111111Представляю вам свои гадкие конспекты по вышматы или не вышмату не знаб но не по кмзи точно. Это очень длинный текст, который нужно сократить и показать троеточие в конце. Продолжение текста, которое будет скрыто до нажатия на троеточие.",
+//        likesCount: 1,
+//        commentsCount: 0
+//    ),
+//    Note(
+//        author: "Макс Пупкин",
+//        date: Date().addingTimeInterval(-86400),
+//        title: "Еще один конспект",
+//        content: "Другой интересный конспект по разным предметам",
+//        likesCount: 5,
+//        commentsCount: 2
+//    )
+//]
+
 
 struct ContentView: View {
     @StateObject private var authService = AuthService()
@@ -35,6 +36,7 @@ struct ContentView: View {
     @State private var savedNotes: [Note] = []
     @State private var selectedTab = 0
     @State private var showNewNote = false
+    @Environment(\.webAuthenticationSession) private var webAuthenticationSession
     
     var body: some View {
         ZStack(alignment: .top) {
@@ -64,6 +66,9 @@ struct ContentView: View {
                                 // Кнопка поиска
                                 Button(action: {
                                     // Действие для поиска
+                                    Task {
+                                        await notesManager.fetchNotes()
+                                    }
                                 }) {
                                     HStack {
                                         Image(systemName: "magnifyingglass")
@@ -104,6 +109,7 @@ struct ContentView: View {
                 .sheet(isPresented: $showNewNote) {
                     NewNoteView(onNoteCreated: { newNote in
                         notesManager.addNote(newNote)
+                        notesManager.UploadNote(Note: newNote)
                     }, currentUsername: authService.username ?? "Неизвестный пользователь")
                 }
                 .tabItem {
@@ -174,6 +180,11 @@ struct ContentView: View {
 
 struct ProfileView: View {
     @ObservedObject var authService: AuthService
+
+    @State private var showSafari = false
+    @State private var startingWebAuthenticationSession = false
+    @Environment(\.webAuthenticationSession) private var webAuthenticationSession
+
     @ObservedObject var notesManager: SharedNotesManager
     @StateObject private var userProfile: UserProfile
     @State private var showImagePicker = false
@@ -184,6 +195,7 @@ struct ProfileView: View {
         self.notesManager = notesManager
         self._userProfile = StateObject(wrappedValue: UserProfile(username: authService.username ?? ""))
     }
+
     
     var userNotes: [Note] {
         notesManager.getUserNotes(username: authService.username ?? "")
@@ -242,7 +254,6 @@ struct ProfileView: View {
                             Text(authService.username ?? "User")
                                 .font(.title)
                                 .foregroundColor(Theme.header)
-                            
                             Text("User Information")
                                 .foregroundColor(Theme.header)
                             
@@ -278,8 +289,17 @@ struct ProfileView: View {
             } else {
                 // Экран входа/регистрации
                 VStack(spacing: 20) {
+                    NavigationLink(destination: SettingsView()) {
+                        Text("Настройки")
+                            .foregroundColor(.white)
+                            .frame(width: 200, height: 50)
+                            .background(Theme.accent)
+                            .cornerRadius(10)
+                    }
+                    .buttonStyle(ScaleButtonStyle())
                     Button(action: {
                         authService.register()
+//                        showSafari = true
                     }) {
                         Text("Регистрация")
                             .foregroundColor(.white)
@@ -288,10 +308,18 @@ struct ProfileView: View {
                             .cornerRadius(10)
                     }
                     .buttonStyle(ScaleButtonStyle())
+//                    .sheet(isPresented: $showSafari) {
+//                        WebViewWithPost(
+//                            url: URL(string: APIConstants.baseURL + APIConstants.AuthEndpoints.check)!,
+//                                        postData: ["refresh_token": "null", "access_token": "null", "next_page": "user"]
+//                                    )
+//                    }
                     
                     Button(action: {
-                        authService.login()
-                    }) {
+                        Task {
+                            await authService.CheckAuth(with: webAuthenticationSession)
+                        }
+                        }) {
                         Text("Вход")
                             .foregroundColor(.white)
                             .frame(width: 200, height: 50)
@@ -299,6 +327,9 @@ struct ProfileView: View {
                             .cornerRadius(10)
                     }
                     .buttonStyle(ScaleButtonStyle())
+//                    .sheet(isPresented: $showSafari) {
+//                        SafariView(url: URL(string: "http://90.156.170.153:8091/realms/master/protocol/openid-connect/auth?client_id=polyclient&response_type=code&scope=openid%20profile&redirect_uri=http://90.156.170.153:3001/user")!)
+//                    }
                 }
             }
         }

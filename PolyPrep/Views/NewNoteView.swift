@@ -275,6 +275,7 @@ struct NewNoteView: View {
             }
         
         let newNote = Note(
+            id: -1,
             author: currentUsername,
             date: Date(),
             title: title.trimmingCharacters(in: .whitespacesAndNewlines),
@@ -282,10 +283,12 @@ struct NewNoteView: View {
             hashtags: hashtagsArray,
             likesCount: 0,
             commentsCount: 0,
+
             isPrivate: isPrivate || isScheduled, // Отложенные заметки всегда приватные
             isScheduled: isScheduled,
             scheduledDate: isScheduled ? scheduledDate : nil,
             attachments: attachments
+
         )
         onNoteCreated(newNote)
         dismiss()

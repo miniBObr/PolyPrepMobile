@@ -72,6 +72,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		795A9F622DB9215A00B9668E /* Exceptions for "PolyPrep" folder in "PolyPrep" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 81F481512D92EF090094F556 /* PolyPrep */;
+		};
 		811463CB2DB59FDC0093F637 /* Exceptions for "PolyPrep" folder in "PolyPrepTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -114,6 +121,7 @@
 		81F481542D92EF090094F556 /* PolyPrep */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				795A9F622DB9215A00B9668E /* Exceptions for "PolyPrep" folder in "PolyPrep" target */,
 				811463CB2DB59FDC0093F637 /* Exceptions for "PolyPrep" folder in "PolyPrepTests" target */,
 				811463CC2DB59FDC0093F637 /* Exceptions for "PolyPrep" folder in "PolyPrepUITests" target */,
 				8194E5602DCE343F00B976DF /* Exceptions for "PolyPrep" folder in "PolyPrep_ Watch App" target */,
@@ -794,6 +802,7 @@
 				DEVELOPMENT_TEAM = JK8G5DLHK4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PolyPrep/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -824,6 +833,7 @@
 				DEVELOPMENT_TEAM = JK8G5DLHK4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PolyPrep/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

@@ -1,5 +1,6 @@
 import Foundation
 
+
 struct Comment: Identifiable, Equatable, Codable {
     let id: UUID
     let author: String
@@ -16,6 +17,7 @@ struct Comment: Identifiable, Equatable, Codable {
 
 struct Note: Identifiable, Equatable, Codable {
     let id: UUID
+
     let author: String
     let date: Date
     let title: String
@@ -23,6 +25,7 @@ struct Note: Identifiable, Equatable, Codable {
     let hashtags: [String]
     var likesCount: Int
     var commentsCount: Int
+
     var isLiked: Bool
     var isSaved: Bool
     var isPrivate: Bool
@@ -47,5 +50,6 @@ struct Note: Identifiable, Equatable, Codable {
         self.scheduledDate = scheduledDate
         self.attachments = attachments
         self.comments = comments
+
     }
 }

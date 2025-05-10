@@ -2,11 +2,13 @@ import SwiftUI
 import AVFoundation
 
 struct NoteCard: View {
+
     let note: Note
     @Binding var savedNotes: [Note]
     @ObservedObject var notesManager: SharedNotesManager
     let currentUsername: String
     
+
     @State private var isExpanded = false
     @State private var isLiked = false
     @State private var isSaved = false
@@ -218,6 +220,7 @@ private struct AttachmentsView: View {
                     }
                 }
             }
+
             .padding(.top, 8)
         }
     }
@@ -239,6 +242,7 @@ private struct HashtagsView: View {
                             .background(color)
                             .foregroundColor(textColor(color))
                             .cornerRadius(15)
+
                     }
                 }
             }
@@ -530,6 +534,7 @@ struct AudioPlayerView: View {
 }
 
 #Preview {
+
     NoteCard(
         note: Note(
             author: "Макс Пупкин",
@@ -545,4 +550,4 @@ struct AudioPlayerView: View {
         currentUsername: "Макс Пупкин"
     )
 }
- 
+
