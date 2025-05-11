@@ -32,7 +32,7 @@ import AuthenticationServices
 
 struct ContentView: View {
     @StateObject private var authService = AuthService()
-    @StateObject private var notesManager = SharedNotesManager.shared
+    @StateObject private var notesManager = NotesManager()
     @State private var savedNotes: [Note] = []
     @State private var selectedTab = 0
     @State private var showNewNote = false
@@ -52,7 +52,7 @@ struct ContentView: View {
                             ScrollView {
                                 LazyVStack(spacing: 16) {
                                     ForEach(notesManager.notes) { note in
-                                        NoteCard(note: note, savedNotes: $savedNotes, notesManager: notesManager, currentUsername: authService.username ?? "Неизвестный пользователь")
+                                        NoteCard(note: note, savedNotes: $savedNotes, currentUsername: authService.username ?? "Неизвестный пользователь")
                                             .contentShape(Rectangle())
                                     }
                                 }
@@ -126,7 +126,7 @@ struct ContentView: View {
                         ScrollView {
                             LazyVStack(spacing: 16) {
                                 ForEach(savedNotes) { note in
-                                    NoteCard(note: note, savedNotes: $savedNotes, notesManager: notesManager, currentUsername: authService.username ?? "Неизвестный пользователь")
+                                    NoteCard(note: note, savedNotes: $savedNotes, /*notesManager: notesManager,*/ currentUsername: authService.username ?? "Неизвестный пользователь")
                                         .contentShape(Rectangle())
                                 }
                             }
@@ -144,7 +144,7 @@ struct ContentView: View {
                 
                 // Profile Tab
                 NavigationView {
-                    ProfileView(authService: authService, notesManager: notesManager)
+                    ProfileView(authService: authService/*, notesManager: notesManager*/)
                 }
                 .tabItem {
                     Image(systemName: "person.fill")
@@ -185,20 +185,30 @@ struct ProfileView: View {
     @State private var startingWebAuthenticationSession = false
     @Environment(\.webAuthenticationSession) private var webAuthenticationSession
 
-    @ObservedObject var notesManager: SharedNotesManager
+//    @ObservedObject var notesManager: SharedNotesManager
     @StateObject private var userProfile: UserProfile
     @State private var showImagePicker = false
     @State private var showAvatarMenu = false
     
-    init(authService: AuthService, notesManager: SharedNotesManager) {
+    init(authService: AuthService) {
         self.authService = authService
-        self.notesManager = notesManager
+//        self.notesManager = notesManager
         self._userProfile = StateObject(wrappedValue: UserProfile(username: authService.username ?? ""))
     }
 
     
     var userNotes: [Note] {
-        notesManager.getUserNotes(username: authService.username ?? "")
+//        notesManager.getUserNotes(username: authService.username ?? "")
+        [Note(
+            id: 0,
+            author: "Макс Пупкин",
+            date: Date(),
+            title: "Конспекты по кмзи от Пупки Лупкиной",
+            content: "Представляю вам свои гадкие конспекты по вышматы или не вышмату не знаб но не по кмзи точно",
+            hashtags: ["#матан", "#крипта", "#бип"],
+            likesCount: 1,
+            commentsCount: 0
+        )]
     }
     
     var body: some View {
@@ -279,7 +289,7 @@ struct ProfileView: View {
                                     .padding(.horizontal)
                                 
                                 ForEach(userNotes) { note in
-                                    NoteCard(note: note, savedNotes: .constant(userNotes), notesManager: notesManager, currentUsername: authService.username ?? "Неизвестный пользователь")
+                                    NoteCard(note: note, savedNotes: .constant(userNotes), /*notesManager: notesManager,*/ currentUsername: authService.username ?? "Неизвестный пользователь")
                                 }
                             }
                             .padding(.top, 32)

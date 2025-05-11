@@ -5,7 +5,7 @@ struct NoteCard: View {
 
     let note: Note
     @Binding var savedNotes: [Note]
-    @ObservedObject var notesManager: SharedNotesManager
+//    @ObservedObject var notesManager: SharedNotesManager
     let currentUsername: String
     
 
@@ -17,10 +17,10 @@ struct NoteCard: View {
     @State private var textHeight: CGFloat = 0
     @State private var hashtagColors: [Color] = []
     
-    init(note: Note, savedNotes: Binding<[Note]>, notesManager: SharedNotesManager, currentUsername: String) {
+    init(note: Note, savedNotes: Binding<[Note]>, currentUsername: String) {
         self.note = note
         self._savedNotes = savedNotes
-        self.notesManager = notesManager
+//        self.notesManager = notesManager
         self.currentUsername = currentUsername
         _isLiked = State(initialValue: note.isLiked)
         _isSaved = State(initialValue: savedNotes.wrappedValue.contains { $0.id == note.id })
@@ -45,7 +45,7 @@ struct NoteCard: View {
     
     private func toggleLike() {
         isLiked.toggle()
-        notesManager.updateNoteLikes(noteId: note.id, isLiked: isLiked, likesCount: note.likesCount + (isLiked ? 1 : -1))
+//        notesManager.updateNoteLikes(noteId: note.id, isLiked: isLiked, likesCount: note.likesCount + (isLiked ? 1 : -1))
     }
     
     private func toggleSaveNote() {
@@ -118,7 +118,7 @@ struct NoteCard: View {
                 isLiked: isLiked,
                 likesCount: note.likesCount,
                 commentsCount: note.commentsCount,
-                notesManager: notesManager,
+//                notesManager: notesManager,
                 currentUsername: currentUsername,
                 savedNotes: $savedNotes,
                 onLike: {
@@ -141,7 +141,7 @@ struct NoteCard: View {
         .alert("Удалить заметку?", isPresented: $showDeleteAlert) {
             Button("Отмена", role: .cancel) { }
             Button("Удалить", role: .destructive) {
-                notesManager.deleteNote(note)
+//                notesManager.deleteNote(note)
                 if isSaved {
                     savedNotes.removeAll { $0.id == note.id }
                 }
@@ -256,7 +256,7 @@ private struct ActionsView: View {
     let isLiked: Bool
     let likesCount: Int
     let commentsCount: Int
-    let notesManager: SharedNotesManager
+//    let notesManager: SharedNotesManager
     let currentUsername: String
     let savedNotes: Binding<[Note]>
     let onLike: () -> Void
@@ -270,7 +270,7 @@ private struct ActionsView: View {
                     HStack(spacing: 4) {
                         Image(systemName: isLiked ? "hand.thumbsup.fill" : "hand.thumbsup")
                             .foregroundColor(isLiked ? .blue : .black)
-                        Text(notesManager.formatCount(likesCount))
+                        Text(/*notesManager.formatCount(likesCount) TODO */"")
                             .foregroundColor(.black)
                     }
                 }
@@ -279,12 +279,12 @@ private struct ActionsView: View {
                     HStack(spacing: 4) {
                         Image(systemName: "bubble.left")
                             .foregroundColor(.black)
-                        Text(notesManager.formatCount(commentsCount))
+                        Text(/*notesManager.formatCount(commentsCount) TODO */"")
                             .foregroundColor(.black)
                     }
                 }
                 .sheet(isPresented: $showComments) {
-                    CommentsView(note: note, notesManager: notesManager, currentUsername: currentUsername, savedNotes: savedNotes)
+                    CommentsView(note: note, currentUsername: currentUsername, savedNotes: savedNotes)
                 }
             }
             
@@ -302,7 +302,7 @@ struct CommentsView: View {
     let note: Note
     @Environment(\.dismiss) private var dismiss
     @State private var newComment = ""
-    @ObservedObject var notesManager: SharedNotesManager
+//    @ObservedObject var notesManager: SharedNotesManager
     @State private var currentUsername: String
     @Binding var savedNotes: [Note]
     
@@ -320,9 +320,9 @@ struct CommentsView: View {
         return note.commentsCount
     }
     
-    init(note: Note, notesManager: SharedNotesManager, currentUsername: String, savedNotes: Binding<[Note]>) {
+    init(note: Note, currentUsername: String, savedNotes: Binding<[Note]>) {
         self.note = note
-        self.notesManager = notesManager
+//        self.notesManager = notesManager
         self._currentUsername = State(initialValue: currentUsername)
         self._savedNotes = savedNotes
     }
@@ -370,7 +370,7 @@ struct CommentsView: View {
                                 date: Date(),
                                 text: newComment
                             )
-                            notesManager.addComment(to: note.id, comment: comment)
+//                            notesManager.addComment(to: note.id, comment: comment) TODO
                             updateSavedNote(with: comment)
                             newComment = ""
                         }
@@ -382,7 +382,7 @@ struct CommentsView: View {
                 }
                 .padding()
             }
-            .navigationTitle("Комментарии (\(notesManager.formatCount(currentCommentsCount)))")
+            .navigationTitle("Комментарии (\(/*notesManager.formatCount(currentCommentsCount TODO */ "")))")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -547,7 +547,7 @@ struct AudioPlayerView: View {
             commentsCount: 0
         ),
         savedNotes: .constant([]),
-        notesManager: SharedNotesManager.shared,
+//        notesManager: SharedNotesManager.shared,
         currentUsername: "Макс Пупкин"
     )
 }
