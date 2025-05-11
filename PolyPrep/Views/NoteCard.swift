@@ -537,6 +537,7 @@ struct AudioPlayerView: View {
 
     NoteCard(
         note: Note(
+            id: 0,
             author: "Макс Пупкин",
             date: Date(),
             title: "Конспекты по кмзи от Пупки Лупкиной",

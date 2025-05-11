@@ -16,7 +16,7 @@ struct Comment: Identifiable, Equatable, Codable {
 }
 
 struct Note: Identifiable, Equatable, Codable {
-    let id: UUID
+    let id: UInt
 
     let author: String
     let date: Date
@@ -34,8 +34,8 @@ struct Note: Identifiable, Equatable, Codable {
     var attachments: [Attachment]
     var comments: [Comment]
     
-    init(author: String, date: Date, title: String, content: String, hashtags: [String], likesCount: Int = 0, commentsCount: Int = 0, isPrivate: Bool = false, isScheduled: Bool = false, scheduledDate: Date? = nil, attachments: [Attachment] = [], comments: [Comment] = []) {
-        self.id = UUID()
+    init(id: UInt, author: String, date: Date, title: String, content: String, hashtags: [String], likesCount: Int = 0, commentsCount: Int = 0, isPrivate: Bool = false, isScheduled: Bool = false, scheduledDate: Date? = nil, attachments: [Attachment] = [], comments: [Comment] = []) {
+        self.id = id
         self.author = author
         self.date = date
         self.title = title

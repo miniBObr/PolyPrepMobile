@@ -97,41 +97,7 @@ class AuthService: ObservableObject {
         guard let url = URL(string: APIConstants.baseURL + APIConstants.AuthEndpoints.callback + "?code=" + code + "&next_page=/user") else { return }
         print(url.absoluteString)
         
-        URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
-            guard let self = self else { return }
-            
-            if let error = error {
-                DispatchQueue.main.async {
-                    self.error = error.localizedDescription
-                }
-                return
-            }
-            
-            guard let data = data else { return }
-            
-            do {
-                let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-                DispatchQueue.main.async {
-                    self.accessToken = json?["access_token"] as? String ?? ""
-                    self.refreshToken = json?["refresh_token"] as? String ?? ""
-                    self.fetchUserInfo(token: self.accessToken!)
-                }
-            } catch {
-                DispatchQueue.main.async {
-                    self.error = error.localizedDescription
-                    print(self.error)
-                }
-            }
-        }.resume()
-    }
-    
-    private func fetchUserInfo(token: String) {
-        guard let url = URL(string: APIConstants.baseURL + APIConstants.AuthEndpoints.userInfo + "?id=" + (getUserIdFromToken(token) ?? "")) else { return }
-        
-        var request = URLRequest(url: url)
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        
-//        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+//        URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
 //            guard let self = self else { return }
 //            
 //            if let error = error {
@@ -142,34 +108,36 @@ class AuthService: ObservableObject {
 //            }
 //            
 //            guard let data = data else { return }
-//            print(String(data: data, encoding: .utf8) ?? "Нет данных")
 //            
-//            do {
-//                let userInfo = try JSONDecoder().decode(UserInfo.self, from: data)
-//                DispatchQueue.main.async {
-//                    self.userInfo = userInfo
-//                    self.username = userInfo.username
-//                    self.isLoggedIn = true
-//                }
-//            } catch {
-//                DispatchQueue.main.async {
-//                    self.error = error.localizedDescription
-//                }
-//            }
 //        }.resume()
-        var data = HandleNetwork(request) ?? Data()
+        
+        guard let data = HandleNetwork(url) else { return }
+        do {
+            let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+                self.accessToken = json?["access_token"] as? String ?? ""
+                self.refreshToken = json?["refresh_token"] as? String ?? ""
+                self.fetchUserInfo(token: self.accessToken!)
+        } catch {
+                self.error = error.localizedDescription
+                print(self.error ?? "No error...")
+        }
+    }
+    
+    private func fetchUserInfo(token: String) {
+        guard let url = URL(string: APIConstants.baseURL + APIConstants.AuthEndpoints.userInfo + "?id=" + (getUserIdFromToken(token) ?? "")) else { return }
+        
+        var request = URLRequest(url: url)
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        let data = HandleNetwork(request) ?? Data()
         do {
             let userInfo = try JSONDecoder().decode(UserInfo.self, from: data)
-//            DispatchQueue.main.async {
-                self.userInfo = userInfo
-                self.username = userInfo.username
-                self.isLoggedIn = true
-//            }
+            self.userInfo = userInfo
+            self.username = userInfo.username
+            self.isLoggedIn = true
         } catch {
-            DispatchQueue.main.async {
-                self.error = error.localizedDescription
-                print("USER DATA ERROR!: ", self.error)
-            }
+            self.error = error.localizedDescription
+            print("USER DATA ERROR!: ", self.error ?? "No error...")
         }
     }
     
@@ -180,8 +148,6 @@ class AuthService: ObservableObject {
         }
         
         var request = URLRequest(url: url)
-//        let accessToken = UserDefaults.standard.string(forKey: "access_token")
-//        let refreshToken = UserDefaults.standard.string(forKey: "refresh_token")
         
         request.httpMethod = "POST"
         let requestBody: [String: Any] = [
@@ -245,22 +211,5 @@ class AuthService: ObservableObject {
         
         // 3. Извлекаем поле "sub"
         return json["sub"] as? String
-    }
-    
-    private func HandleNetwork(_ request: URLRequest) -> Data?
-    {
-        var tmp_data: Data?
-        URLSession.shared.dataTask(with: request){ data, response, error in
-            print("Network request: ", request.url?.absoluteString ?? "")
-            guard let httpResponse = response as? HTTPURLResponse else {
-                print( NSError(domain: "Invalid response", code: 0))
-                return
-            }
-            print("Status code:", httpResponse.statusCode)
-            print("Response:", String(data: data ?? Data(), encoding: .utf8) ?? "")
-            tmp_data = data
-        }.resume()
-        while tmp_data == nil {}
-        return tmp_data
     }
 }

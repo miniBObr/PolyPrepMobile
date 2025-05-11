@@ -275,7 +275,7 @@ struct NewNoteView: View {
             }
         
         let newNote = Note(
-//            id: -1,
+            id: 0,
             author: currentUsername,
             date: Date(),
             title: title.trimmingCharacters(in: .whitespacesAndNewlines),

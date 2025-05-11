@@ -133,7 +133,32 @@ class SharedNotesManager: ObservableObject {
         saveNotes()
     }
     
+    private func NetworkDelete(_ note: Note)
+    {
+        guard let url = URL(string: APIConstants.baseURL + "/post?id=" + String(note.id)) else {
+            fatalError("Invalid URL")
+        }
+        
+        print("Network delete post: ", url.absoluteString)
+        var request = URLRequest(url: url)
+        let accessToken = UserDefaults.standard.string(forKey: "access_token")
+        
+        request.setValue("Bearer " + accessToken!, forHTTPHeaderField: "Authorization")
+        request.httpMethod = "DELETE"
+        
+        URLSession.shared.dataTask(with: request){ data, response, error in
+        
+            guard let httpResponse = response as? HTTPURLResponse else {
+                print( NSError(domain: "Invalid response", code: 0))
+                return
+            }
+            print("Status code:", httpResponse.statusCode)
+            print("Response:", String(data: data ?? Data(), encoding: .utf8) ?? "")
+        }.resume()
+    }
+    
     func deleteNote(_ note: Note) {
+        NetworkDelete(note)
         print("📱 App: Deleting note: \(note.title)")
         var currentNotes = notes
         currentNotes.removeAll { $0.id == note.id }
@@ -155,7 +180,7 @@ class SharedNotesManager: ObservableObject {
         return notes.filter { $0.author == username }
     }
     
-    func toggleLike(for noteId: UUID) {
+    func toggleLike(for noteId: UInt) {
         if let index = notes.firstIndex(where: { $0.id == noteId }) {
             var updatedNote = notes[index]
             updatedNote.isLiked.toggle()
@@ -164,7 +189,7 @@ class SharedNotesManager: ObservableObject {
         }
     }
     
-    func updateNoteLikes(noteId: UUID, isLiked: Bool, likesCount: Int) {
+    func updateNoteLikes(noteId: UInt, isLiked: Bool, likesCount: Int) {
         if let index = notes.firstIndex(where: { $0.id == noteId }) {
             var updatedNote = notes[index]
             updatedNote.isLiked = isLiked
@@ -173,7 +198,7 @@ class SharedNotesManager: ObservableObject {
         }
     }
     
-    func addComment(to noteId: UUID, comment: Comment) {
+    func addComment(to noteId: UInt, comment: Comment) {
         if let index = notes.firstIndex(where: { $0.id == noteId }) {
             var updatedNote = notes[index]
             updatedNote.comments.insert(comment, at: 0)
@@ -223,9 +248,9 @@ class SharedNotesManager: ObservableObject {
         URLSession.shared.dataTask(with: request){ data, response, error in
         
             guard let httpResponse = response as? HTTPURLResponse else {
-                    print( NSError(domain: "Invalid response", code: 0))
+                print( NSError(domain: "Invalid response", code: 0))
                 return
-                }
+            }
             print("Status code:", httpResponse.statusCode)
             print("Response:", String(data: data ?? Data(), encoding: .utf8) ?? "")
         }.resume()
@@ -331,7 +356,7 @@ class SharedNotesManager: ObservableObject {
                         for post in posts {
                             addNote(
                                 Note(
-//                                    id: post["id"] as! Int,
+                                    id: post["id"] as! UInt,
                                     author: await getUsername(id: post["author_id"] as! String),
                                     date: Date(timeIntervalSince1970: post["updated_at"] as! TimeInterval),
                                     title: post["title"] as! String, content: post["text"] as! String,

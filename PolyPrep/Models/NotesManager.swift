@@ -41,7 +41,7 @@ class NotesManager: ObservableObject {
         return notes.filter { $0.author == username }
     }
     
-    func toggleLike(for noteId: UUID) {
+    func toggleLike(for noteId: UInt) {
         if let index = notes.firstIndex(where: { $0.id == noteId }) {
             var updatedNote = notes[index]
             updatedNote.isLiked.toggle()
@@ -50,7 +50,7 @@ class NotesManager: ObservableObject {
         }
     }
     
-    func updateNoteLikes(noteId: UUID, isLiked: Bool, likesCount: Int) {
+    func updateNoteLikes(noteId: UInt, isLiked: Bool, likesCount: Int) {
         if let index = notes.firstIndex(where: { $0.id == noteId }) {
             var updatedNote = notes[index]
             updatedNote.isLiked = isLiked
@@ -59,7 +59,7 @@ class NotesManager: ObservableObject {
         }
     }
     
-    func addComment(to noteId: UUID, comment: Comment) {
+    func addComment(to noteId: UInt, comment: Comment) {
         if let index = notes.firstIndex(where: { $0.id == noteId }) {
             var updatedNote = notes[index]
             updatedNote.comments.insert(comment, at: 0)

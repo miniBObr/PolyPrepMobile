@@ -98,7 +98,6 @@
 			membershipExceptions = (
 				Constants/APIConstants.swift,
 				Models/AuthModels.swift,
-				Models/SharedNotesManager.swift,
 			);
 			target = 8194E5192DCE186200B976DF /* PolyPrep_ Watch App */;
 		};
