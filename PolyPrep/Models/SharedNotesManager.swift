@@ -245,15 +245,17 @@ class SharedNotesManager: ObservableObject {
             }
         request.httpBody = jsonData
         
-        URLSession.shared.dataTask(with: request){ data, response, error in
-        
-            guard let httpResponse = response as? HTTPURLResponse else {
-                print( NSError(domain: "Invalid response", code: 0))
-                return
-            }
-            print("Status code:", httpResponse.statusCode)
-            print("Response:", String(data: data ?? Data(), encoding: .utf8) ?? "")
-        }.resume()
+//        URLSession.shared.dataTask(with: request){ data, response, error in
+//        
+//            guard let httpResponse = response as? HTTPURLResponse else {
+//                print( NSError(domain: "Invalid response", code: 0))
+//                return
+//            }
+//            print("Status code:", httpResponse.statusCode)
+//            print("Response:", String(data: data ?? Data(), encoding: .utf8) ?? "")
+//        }.resume()
+        _ = HandleNetwork(request)
+        showAlert(title: "Внимание", message: "Это тестовое сообщение")
     }
     
     func getUsername(id: String) async -> String {

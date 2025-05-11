@@ -50,6 +50,5 @@ struct Note: Identifiable, Equatable, Codable {
         self.scheduledDate = scheduledDate
         self.attachments = attachments
         self.comments = comments
-
     }
 }
